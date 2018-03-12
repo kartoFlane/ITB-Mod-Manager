@@ -276,21 +276,22 @@ public class MenuController
 		alert.setHeaderText( "What's New - Version " + updateInfo.getLatestVersion().toString() );
 		alert.setTitle( "Update Available" );
 
-		VBox root = new VBox();
+		VBox content = new VBox();
 
 		// Links
-		VBox linksBox = null;
 		for ( Map.Entry<String, String> entry : updateInfo.getLatestURLs().entrySet() ) {
-			if ( linksBox == null ) {
-				linksBox = new VBox();
-				root.getChildren().add( linksBox );
-			}
-			linksBox.getChildren().add( UIUtilities.createHyperlink( entry.getKey(), entry.getValue() ) );
+			content.getChildren().add( UIUtilities.createHyperlink( entry.getKey(), entry.getValue() ) );
 		}
+
+		if ( !content.getChildren().isEmpty() )
+			content.getChildren().addAll( new Label() );
 
 		// Notice
 		if ( updateInfo.getNotice() != null && updateInfo.getNotice().length() > 0 ) {
-			root.getChildren().addAll( new Label(), new Label( updateInfo.getNotice() ), new Label() );
+			content.getChildren().addAll(
+				UIUtilities.decoratedText( updateInfo.getNotice(), content.widthProperty() ),
+				new Label()
+			);
 		}
 
 		// Changelog
@@ -299,21 +300,22 @@ public class MenuController
 			if ( ITBModManager.APP_VERSION.compareTo( entry.getKey() ) >= 0 ) break;
 
 			if ( buf.length() > 0 ) buf.append( "\n" );
-			buf.append( entry.getKey() ).append( ":\n" );
+			buf.append( "[b]" ).append( entry.getKey() ).append( "[/b]:\n" );
 
 			for ( String change : entry.getValue() ) {
 				buf.append( "  - " ).append( change ).append( "\n" );
 			}
 		}
-		buf.insert( 0, "Changelog:\n" );
-		root.getChildren().add( new Label( buf.toString() ) );
 
-		ScrollPane pane = new ScrollPane();
-		pane.setContent( root );
-		pane.setFitToWidth( true );
-		pane.setPrefHeight( 300 );
+		content.getChildren().add( UIUtilities.decoratedText( buf.toString(), content.widthProperty() ) );
 
-		alert.getDialogPane().setContent( pane );
+		ScrollPane root = new ScrollPane();
+		root.setContent( content );
+		root.setFitToWidth( true );
+		root.setPrefHeight( 300 );
+		root.setPrefWidth( 450 );
+
+		alert.getDialogPane().setContent( root );
 
 		alert.show();
 	}
