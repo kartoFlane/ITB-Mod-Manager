@@ -84,21 +84,11 @@ public class FolderPack extends AbstractPack
 
 		dstFile.getParentFile().mkdirs();
 
-		FileOutputStream os = null;
-		try {
-			os = new FileOutputStream( dstFile );
-
+		try ( FileOutputStream os = new FileOutputStream( dstFile ) ) {
 			byte[] buf = new byte[4096];
 			int len;
 			while ( ( len = is.read( buf ) ) >= 0 ) {
 				os.write( buf, 0, len );
-			}
-		}
-		finally {
-			try {
-				if ( os != null ) os.close();
-			}
-			catch ( IOException e ) {
 			}
 		}
 	}
@@ -108,21 +98,11 @@ public class FolderPack extends AbstractPack
 	{
 		File srcFile = getFile( innerPath );
 
-		FileInputStream is = null;
-		try {
-			is = new FileInputStream( srcFile );
-
+		try ( FileInputStream is = new FileInputStream( srcFile ) ) {
 			byte[] buf = new byte[4096];
 			int len;
 			while ( ( len = is.read( buf ) ) >= 0 ) {
 				os.write( buf, 0, len );
-			}
-		}
-		finally {
-			try {
-				if ( is != null ) is.close();
-			}
-			catch ( IOException e ) {
 			}
 		}
 	}

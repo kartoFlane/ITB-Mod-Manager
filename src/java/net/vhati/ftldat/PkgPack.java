@@ -674,22 +674,11 @@ public class PkgPack extends AbstractPack
 	@Override
 	public void extractTo( String innerPath, OutputStream os ) throws FileNotFoundException, IOException
 	{
-		InputStream is = null;
-
-		try {
-			is = getInputStream( innerPath );
-
+		try ( InputStream is = getInputStream( innerPath ) ) {
 			byte[] buf = new byte[4096];
 			int len;
 			while ( ( len = is.read( buf ) ) >= 0 ) {
 				os.write( buf, 0, len );
-			}
-		}
-		finally {
-			try {
-				if ( is != null ) is.close();
-			}
-			catch ( IOException e ) {
 			}
 		}
 	}
