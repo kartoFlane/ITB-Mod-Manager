@@ -100,7 +100,7 @@ public class LuaLoader
 
 	public LuaTable loadAsTable( InputStream stream, String chunkName ) throws IOException, LuaError
 	{
-		return load( ModUtilities.decodeText( stream, chunkName ).text, chunkName ).returnValue.checktable();
+		return load( "return " + ModUtilities.decodeText( stream, chunkName ).text, chunkName ).returnValue.checktable();
 	}
 
 	// ------------------------------------------------------------------------------
