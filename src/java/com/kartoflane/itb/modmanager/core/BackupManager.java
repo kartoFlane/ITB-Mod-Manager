@@ -1,10 +1,8 @@
 package com.kartoflane.itb.modmanager.core;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -18,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.kartoflane.itb.modmanager.ITBModManager;
 import com.kartoflane.itb.modmanager.core.ModPatchThread.ReinstallRequiredException;
+import com.kartoflane.itb.modmanager.util.Util;
 
 import javafx.application.HostServices;
 import javafx.application.Platform;
@@ -124,13 +123,13 @@ public class BackupManager
 	 * 
 	 * @param resourceBud
 	 *            BackedUpDat instance for the resource.dat file
-	 * @param hashFileInnerPath
+	 * @param infoFileInnerPath
 	 *            innerPath to the file containing hash info of the .dat file it's in
 	 * @return true if backups need to be redone, false otherwise.
 	 * @throws ReinstallRequiredException
 	 *             if game's dat contained hash info that did not match the backed up hash
 	 */
-	public boolean checkDatHash( BackedUpFile resourceBud, String hashFileInnerPath )
+	public boolean checkDatHash( BackedUpFile resourceBud, String infoFileInnerPath )
 		throws IOException, NoSuchAlgorithmException, ReinstallRequiredException
 	{
 		if ( !resourceBud.bakFile.exists() ) {
@@ -142,24 +141,24 @@ public class BackupManager
 			AbstractPack datPack = new FTLPack( resourceBud.srcFile, "r+" );
 			AbstractPack bakPack = new FTLPack( resourceBud.bakFile, "r" )
 		) {
-			String readBakHash = extractToString( bakPack, hashFileInnerPath );
+			ModdedDatInfo bakInfo = ModdedDatInfo.build( bakPack, infoFileInnerPath );
 
-			if ( datPack.contains( hashFileInnerPath ) ) {
+			if ( datPack.contains( infoFileInnerPath ) ) {
 				// Check if read and backed up dats hashes match.
 				// If they don't, warn that backups are likely stale, and
 				// the current dats are modded by another copy of the manager
 				// So ITB needs a reinstall or Steam cache verified
 				// If they do match, then we don't need to do anything.
-				String readDatHash = extractToString( datPack, hashFileInnerPath );
+				ModdedDatInfo datInfo = ModdedDatInfo.build( datPack, infoFileInnerPath );
 
-				if ( !readDatHash.equals( readBakHash ) ) {
-					log.warn( "Game's dat contained hash info, but didn't match backed up hash - reinstall required." );
+				if ( !datInfo.originalHash.equals( bakInfo.originalHash ) ) {
+					log.warn( "Game's dat contained modded info, but hashes didn't match - reinstall required." );
 
 					Platform.runLater(
 						() -> {
 							Alert alert = new Alert(
 								AlertType.WARNING,
-								"Game's resource.dat contains computed hash information that did not match backed up hash.\n\n"
+								"Game's resource.dat contains modded info, but its computed hash did not match backed up hash.\n\n"
 									+ "This means that the manager's backups are most likely stale, and need to be updated, and "
 									+ "that the game files have been modded.\n\n"
 									+ "Reinstall the game or use Steam's 'Verify Integrity' option to fix this.",
@@ -182,43 +181,25 @@ public class BackupManager
 				// recompute the hash next time.
 				String computedDatHash = PackUtilities.calcFileMD5( resourceBud.srcFile );
 
-				if ( computedDatHash.equals( readBakHash ) ) {
-					log.info( "Game's dat did not contain hash info, but backed up hash matches - inserting hash file." );
-					try (
-						ByteArrayInputStream is = new ByteArrayInputStream(
-							computedDatHash.getBytes( StandardCharsets.UTF_8 )
-						)
-					) {
-						datPack.add( hashFileInnerPath, is );
+				if ( computedDatHash.equals( bakInfo.originalHash ) ) {
+					log.info( "Game's dat did not contain modded info, but backed up hash matches - inserting modded info file." );
+					ModdedDatInfo datInfo = new ModdedDatInfo();
+					datInfo.originalHash = computedDatHash;
+
+					try ( InputStream is = Util.getInputStream( datInfo.toLuaString() ) ) {
+						datPack.add( infoFileInnerPath, is );
 						datPack.repack();
 					}
 					return false;
 				}
 				else {
 					log.warn(
-						"Game's dat did not contain hash info, and backed up hash did not match - "
+						"Game's dat did not contain modded info, and backed up hash did not match - "
 							+ "assuming the game was updated; forcing backup."
 					);
 					return true;
 				}
 			}
-		}
-	}
-
-	/**
-	 * Reads contents of the specified innerPath from the specified pack and returns it as string.
-	 * 
-	 * @param pack
-	 *            pack to read from
-	 * @param innerPath
-	 *            the innerPath to read
-	 * @return content of the innerPath
-	 */
-	private static String extractToString( AbstractPack pack, String innerPath ) throws IOException
-	{
-		try ( ByteArrayOutputStream hashOut = new ByteArrayOutputStream() ) {
-			pack.extractTo( innerPath, hashOut );
-			return hashOut.toString( StandardCharsets.UTF_8.name() );
 		}
 	}
 

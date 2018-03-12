@@ -1,12 +1,10 @@
 package com.kartoflane.itb.modmanager.core;
 
 import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -36,12 +34,14 @@ import com.kartoflane.itb.modmanager.patcher.FMODPatcher;
 import com.kartoflane.itb.modmanager.patcher.LuaPatcher;
 import com.kartoflane.itb.modmanager.patcher.ResourcePatcher;
 import com.kartoflane.itb.modmanager.patcher.TxtPatcher;
+import com.kartoflane.itb.modmanager.util.Util;
 
 import net.vhati.ftldat.AbstractPack;
 import net.vhati.ftldat.FTLPack;
 import net.vhati.ftldat.FolderPack;
 import net.vhati.ftldat.PackContainer;
 import net.vhati.ftldat.PackUtilities;
+import net.vhati.modmanager.core.ModInfo;
 import net.vhati.modmanager.core.ModUtilities;
 
 
@@ -61,7 +61,8 @@ public class ModPatchThread extends Thread
 	private Thread shutdownHook = null;
 
 	private final BackupManager backupManager;
-	private final List<File> modFiles = new ArrayList<File>();
+	private final List<ModInfo> modInfos = new ArrayList<>();
+	private final List<File> modFiles = new ArrayList<>();
 	private File gameDir = null;
 
 	private final int progMax = 100;
@@ -74,12 +75,14 @@ public class ModPatchThread extends Thread
 
 	public ModPatchThread(
 		BackupManager backupManager,
+		List<ModInfo> modInfos,
 		List<File> modFiles,
 		File gameDir
 	)
 	{
 		super( "patch" );
 		this.backupManager = backupManager;
+		this.modInfos.addAll( modInfos );
 		this.modFiles.addAll( modFiles );
 		this.gameDir = gameDir;
 	}
@@ -179,13 +182,13 @@ public class ModPatchThread extends Thread
 			File resourceDatFile = new File( resourcesDir, "resource.dat" );
 
 			final String scriptsListFilePath = "scripts.lua";
-			final String hashFilePath = "hash.txt";
+			final String infoFileInnerPath = "modded.info";
 
 			List<BackedUpFile> backedUpDats = backupManager.listBackedUpFiles();
 			BackedUpFile resourceBud = backupManager.getBackupForFile( resourceDatFile );
 
 			patchingStatusChanged.broadcast( "Checking hashes..." );
-			boolean forceBackup = backupManager.checkDatHash( resourceBud, hashFilePath );
+			boolean forceBackup = backupManager.checkDatHash( resourceBud, infoFileInnerPath );
 
 			boolean resourceBakExisted = resourceBud.bakFile.exists();
 			boolean backupSuccessful = backupAndRestoreGameData( backedUpDats, forceBackup );
@@ -194,19 +197,20 @@ public class ModPatchThread extends Thread
 
 			if ( !resourceBakExisted ) {
 				// resource.dat.bak did not exist - need to write hash info to it.
-				String hash = PackUtilities.calcFileMD5( resourceBud.srcFile );
+				ModdedDatInfo datInfo = new ModdedDatInfo();
+				datInfo.originalHash = PackUtilities.calcFileMD5( resourceBud.srcFile );
 				try (
-					ByteArrayInputStream is = new ByteArrayInputStream( hash.getBytes( StandardCharsets.UTF_8 ) );
+					InputStream is = Util.getInputStream( datInfo.toLuaString() );
 					AbstractPack pack = new FTLPack( resourceBud.bakFile, "r+" )
 				) {
-					if ( pack.contains( hashFilePath ) ) {
-						log.warn( "Game's resources already contained computed hash. Game may not be in vanilla state." );
+					if ( pack.contains( infoFileInnerPath ) ) {
+						log.warn( "Game's resources already contained modded info. Game may not be in vanilla state." );
 						// Don't overwrite, since the hash we just computed is wrong.
 						// TODO: Display an alert warning the user, and ask if they want to continue patching anyway?
 						// will need a way to stop this thread and wait for the alert to be dismissed, tho.
 					}
 					else {
-						pack.add( hashFilePath, is );
+						pack.add( infoFileInnerPath, is );
 						pack.repack();
 					}
 				}
@@ -234,6 +238,8 @@ public class ModPatchThread extends Thread
 			packContainer.setPackFor( "fonts/", datPack );
 			packContainer.setPackFor( "img/", datPack );
 			packContainer.setPackFor( null, null );
+
+			ModdedDatInfo bakInfo = ModdedDatInfo.build( datPack, infoFileInnerPath );
 
 			// Track modified innerPaths in case they're clobbered.
 			List<String> moddedItems = new ArrayList<>();
@@ -272,8 +278,10 @@ public class ModPatchThread extends Thread
 			// Group1: parentPath/, Group2: root/, Group3: fileName.
 			Pattern pathPtn = Pattern.compile( "^(?:(([^/]+/)(?:.*/)?))?([^./]+\\.([^/]+))$" );
 
-			for ( File modFile : modFiles ) {
+			for ( int i = 0; i < modFiles.size(); ++i ) {
 				if ( !keepRunning ) return false;
+
+				File modFile = modFiles.get( i );
 
 				try (
 					FileInputStream fis = new FileInputStream( modFile );
@@ -330,6 +338,10 @@ public class ModPatchThread extends Thread
 
 						zis.closeEntry();
 					}
+
+					ModInfo modInfo = modInfos.get( i );
+					bakInfo.installedModsNames.add( modInfo.getTitle() );
+					bakInfo.installedModsHashes.add( modInfo.getFileHash() );
 				}
 				finally {
 					System.gc();
@@ -342,11 +354,7 @@ public class ModPatchThread extends Thread
 			patchingProgressChanged.broadcast( progMilestone, progMax );
 
 			// Rebuild scripts.lua
-			try (
-				ByteArrayInputStream is = new ByteArrayInputStream(
-					rebuildScriptsList( vanillaScriptsList, moddedScriptsList ).getBytes( StandardCharsets.UTF_8 )
-				);
-			) {
+			try ( InputStream is = Util.getInputStream( rebuildScriptsList( vanillaScriptsList, moddedScriptsList ) ) ) {
 				if ( scriptsPack.contains( scriptsListFilePath ) )
 					scriptsPack.remove( scriptsListFilePath );
 				scriptsPack.add( scriptsListFilePath, is );

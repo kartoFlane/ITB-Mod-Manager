@@ -1,11 +1,13 @@
 package com.kartoflane.itb.modmanager.util;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 
 
@@ -70,5 +72,13 @@ public class Util
 		freshCal.getTimeInMillis();  // Re-calculate calendar fields.
 
 		return fileCal.compareTo( freshCal ) < 0;
+	}
+
+	/**
+	 * Returns a ByteArrayInputStream over the specified string's bytes, with UTF-8 encoding.
+	 */
+	public static InputStream getInputStream( String input )
+	{
+		return new ByteArrayInputStream( input.getBytes( StandardCharsets.UTF_8 ) );
 	}
 }

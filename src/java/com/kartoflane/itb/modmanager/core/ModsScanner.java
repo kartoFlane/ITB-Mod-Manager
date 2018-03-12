@@ -36,6 +36,7 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
+import net.vhati.ftldat.PackUtilities;
 import net.vhati.modmanager.core.ModDB;
 import net.vhati.modmanager.core.ModFileInfo;
 import net.vhati.modmanager.core.ModInfo;
@@ -160,6 +161,32 @@ public class ModsScanner
 				return new Label( bodyBuf.toString() );
 			}
 		}
+	}
+
+	public ModInfo getModInfo( File modFile )
+	{
+		String hash = modFileHashes.get( modFile );
+		if ( hash == null ) {
+			try {
+				hash = PackUtilities.calcFileMD5( modFile );
+			}
+			catch ( Exception e ) {
+			}
+		}
+
+		ModInfo modInfo = localModDB.getModInfo( hash );
+
+		if ( modInfo == null ) {
+			if ( scanning ) {
+				// TODO: Some more intelligent handling of this case; disable patch button while scanning is still in progress?
+				throw new IllegalArgumentException( "ModInfo is not yet available for " + modFile.getName() );
+			}
+			else {
+				throw new IllegalArgumentException( "Scanning completed, but no ModInfo available for " + modFile.getName() );
+			}
+		}
+
+		return modInfo;
 	}
 
 	/**

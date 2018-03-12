@@ -42,6 +42,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import net.vhati.modmanager.core.AutoUpdateInfo;
 import net.vhati.modmanager.core.ModFileInfo;
+import net.vhati.modmanager.core.ModInfo;
 
 
 public class ManagerWindow
@@ -283,7 +284,11 @@ public class ManagerWindow
 					}
 				}
 
-				ModPatchThread patchThread = new ModPatchThread( backupManager, modFiles, gameDir );
+				List<ModInfo> modInfos = modFiles.stream()
+					.map( modsScanner::getModInfo )
+					.collect( Collectors.toList() );
+
+				ModPatchThread patchThread = new ModPatchThread( backupManager, modInfos, modFiles, gameDir );
 				patchThread.patchingProgressChangedEvent().addListener( patchDialog::patchingProgress );
 				patchThread.patchingStatusChangedEvent().addListener( patchDialog::setStatusTextLater );
 				patchThread.patchingModStartedEvent().addListener( patchDialog::patchingMod );
