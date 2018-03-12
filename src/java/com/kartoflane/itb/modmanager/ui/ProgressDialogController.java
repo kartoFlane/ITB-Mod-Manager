@@ -51,6 +51,7 @@ public class ProgressDialogController
 
 		stage.initOwner( owner );
 		stage.setResizable( false );
+		stage.setOnCloseRequest( e -> e.consume() );
 		stage.initModality( Modality.APPLICATION_MODAL );
 	}
 
