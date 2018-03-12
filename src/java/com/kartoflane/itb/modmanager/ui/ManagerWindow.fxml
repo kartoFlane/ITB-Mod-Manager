@@ -8,6 +8,7 @@
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
 
 <VBox alignment="top_center" styleClass="root" xmlns:fx="http://javafx.com/fxml">
 	<!-- MenuBar inserted here -->
@@ -20,8 +21,12 @@
 					<Insets bottom="10" left="10" right="10" top="10" />
 				</padding>
 				<!-- TreeView inserted here -->
-				<Button fx:id="btnPatch" prefWidth="100" onAction="#onPatchClicked"
-					text="Patch" />
+				<HBox alignment="top_right" spacing="10">
+					<Button fx:id="btnToggleAll" prefWidth="100" onAction="#onToggleAllClicked"
+						text="Toggle All" />
+					<Button fx:id="btnPatch" prefWidth="100" onAction="#onPatchClicked"
+						text="Patch" />
+				</HBox>
 			</VBox>
 			<ScrollPane fx:id="scrollPaneRight" minWidth="100">
 				<content>

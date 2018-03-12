@@ -131,6 +131,20 @@ public class ModListController implements ModFileInfoView
 			.collect( Collectors.toList() );
 	}
 
+	public void toggleAllItemSelection()
+	{
+		List<TreeItem<ModFileInfo>> rootChildren = treeView.getRoot().getChildren();
+
+		boolean anyDeselected = rootChildren.stream()
+			.map( item -> (CheckBoxTreeItem<ModFileInfo>)item )
+			.anyMatch( item -> !item.isSelected() );
+
+		rootChildren.stream()
+			.map( item -> (CheckBoxTreeItem<ModFileInfo>)item )
+			.forEach( item -> item.setSelected( anyDeselected ) );
+	}
+
+
 	private void clearModel()
 	{
 		// Unregister listeners

@@ -58,6 +58,8 @@ public class ManagerWindow
 	@FXML
 	protected VBox contentPaneRight;
 	@FXML
+	protected Button btnToggleAll;
+	@FXML
 	protected Button btnPatch;
 
 	protected Stage stage;
@@ -206,7 +208,13 @@ public class ManagerWindow
 	}
 
 	@FXML
-	protected void onPatchClicked( ActionEvent event )
+	private void onToggleAllClicked( ActionEvent event )
+	{
+		modListController.toggleAllItemSelection();
+	}
+
+	@FXML
+	private void onPatchClicked( ActionEvent event )
 	{
 		if ( gameDir != null ) {
 			List<File> modFiles = modListController.getSelectedMods().stream()
