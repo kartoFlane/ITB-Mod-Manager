@@ -1,15 +1,15 @@
 package net.vhati.ftldat;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
 
 
-public class FileChannelRegionInputStream extends InputStream {
-
+public class FileChannelRegionInputStream extends InputStream
+{
 	private FileChannel channel;
 	private long regionOffset;
 	private long regionLength;
@@ -24,11 +24,13 @@ public class FileChannelRegionInputStream extends InputStream {
 	private long intraPos = 0;
 
 
-	public FileChannelRegionInputStream( FileChannel channel, long offset, long length ) {
+	public FileChannelRegionInputStream( FileChannel channel, long offset, long length )
+	{
 		this( channel, offset, length, 4096 );
 	}
 
-	public FileChannelRegionInputStream( FileChannel channel, long offset, long length, int bufferSize ) {
+	public FileChannelRegionInputStream( FileChannel channel, long offset, long length, int bufferSize )
+	{
 		this.channel = channel;
 		this.regionOffset = offset;
 		this.regionLength = length;
@@ -36,17 +38,19 @@ public class FileChannelRegionInputStream extends InputStream {
 	}
 
 	@Override
-	public int available() throws IOException {
+	public int available() throws IOException
+	{
 		if ( !channel.isOpen() ) throw new ClosedChannelException();
 		return bufLength;
 	}
 
 	@Override
-	public int read() throws IOException {
+	public int read() throws IOException
+	{
 		if ( !channel.isOpen() ) throw new ClosedChannelException();
 		if ( intraPos >= regionLength ) return -1;
 
-		if ( intraPos < bufOffset || intraPos >= bufOffset+bufLength ) {
+		if ( intraPos < bufOffset || intraPos >= bufOffset + bufLength ) {
 			// The requested byte isn't currently buffered.
 			bufOffset = intraPos;
 			int len = 0;          // Get *something*.
@@ -57,35 +61,37 @@ public class FileChannelRegionInputStream extends InputStream {
 			if ( len == -1 ) {
 				bufLength = 0;
 				return -1;
-			} else {
+			}
+			else {
 				bufLength = len;
 			}
 		}
 
 		// Do an absolute get() from the buffer,
-		//   and interpret the byte as if it were unsigned.
-		int result = buf.get( (int)(intraPos - bufOffset) ) & 0xff;
+		// and interpret the byte as if it were unsigned.
+		int result = buf.get( (int)( intraPos - bufOffset ) ) & 0xff;
 		intraPos++;
 		return result;
 	}
 
 	@Override
-	public int read( byte[] b, int bOff, int bLen ) throws IOException {
+	public int read( byte[] b, int bOff, int bLen ) throws IOException
+	{
 		if ( bLen == 0 ) return 0;
 		if ( bOff < 0 ) throw new IndexOutOfBoundsException( String.format( "Index: %d, Size: %d", bOff, bLen ) );
-		if ( bOff + bLen > b.length ) throw new IndexOutOfBoundsException( String.format( "Index: %d, Size: %d", (bOff+bLen), bLen ) );
+		if ( bOff + bLen > b.length ) throw new IndexOutOfBoundsException( String.format( "Index: %d, Size: %d", ( bOff + bLen ), bLen ) );
 		if ( !channel.isOpen() ) throw new ClosedChannelException();
 		if ( intraPos >= regionLength ) return -1;
 
-		int bytesTotal = Math.min( bLen, (int)(regionLength - intraPos) );
+		int bytesTotal = Math.min( bLen, (int)( regionLength - intraPos ) );
 		int bytesRemaining = bytesTotal;
 		int bytesRead = 0;
 
-		if ( intraPos >= bufOffset && intraPos < bufOffset+bufLength ) {
+		if ( intraPos >= bufOffset && intraPos < bufOffset + bufLength ) {
 			// Read part of the current buffer, possibly until the end.
 
-			buf.position( (int)(intraPos - bufOffset) );
-			int bufTodo = Math.min( bytesRemaining, bufLength - (int)(intraPos - bufOffset) );
+			buf.position( (int)( intraPos - bufOffset ) );
+			int bufTodo = Math.min( bytesRemaining, bufLength - (int)( intraPos - bufOffset ) );
 			buf.get( b, bOff, bufTodo );
 			bytesRemaining -= bufTodo;
 			bytesRead += bufTodo;
@@ -102,7 +108,8 @@ public class FileChannelRegionInputStream extends InputStream {
 			if ( len == -1 ) {
 				bufLength = 0;
 				throw new BufferUnderflowException();
-			} else {
+			}
+			else {
 				bufLength = len;
 			}
 
@@ -119,7 +126,8 @@ public class FileChannelRegionInputStream extends InputStream {
 
 
 	@Override
-	public long skip( long n ) throws IOException {
+	public long skip( long n ) throws IOException
+	{
 		if ( !channel.isOpen() ) throw new ClosedChannelException();
 		if ( intraPos >= regionLength ) return -1;
 

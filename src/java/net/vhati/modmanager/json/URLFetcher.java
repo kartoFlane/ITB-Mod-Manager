@@ -24,7 +24,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 
-public class URLFetcher {
+public class URLFetcher
+{
 	private static final Logger log = LogManager.getLogger();
 
 
@@ -41,7 +42,8 @@ public class URLFetcher {
 	 *
 	 * @return true if successfully downloaded, false otherwise
 	 */
-	public static boolean refetchURL( String url, File localFile, File eTagFile ) {
+	public static boolean refetchURL( String url, File localFile, File eTagFile )
+	{
 		String localETag = null;
 
 		log.debug( String.format( "Attempting to download the latest \"%s\"", localFile.getName() ) );
@@ -79,7 +81,7 @@ public class URLFetcher {
 			.disableAutomaticRetries()
 			.disableConnectionState()
 			.disableCookieManagement()
-			//.setUserAgent( "" )
+			// .setUserAgent( "" )
 			.build();
 
 		try {
@@ -108,23 +110,29 @@ public class URLFetcher {
 				return false;
 			}
 			else {
-				throw new ClientProtocolException( "Unexpected response status: "+ status );
+				throw new ClientProtocolException( "Unexpected response status: " + status );
 			}
 		}
 		catch ( ClientProtocolException e ) {
-			log.error( "GET request failed for url: "+ request.getURI().toString(), e );
+			log.error( "GET request failed for url: " + request.getURI().toString(), e );
 			return false;
 		}
 		catch ( IOException e ) {
-			log.error( "Download failed for url: "+ request.getURI().toString(), e );
+			log.error( "Download failed for url: " + request.getURI().toString(), e );
 			return false;
 		}
 		finally {
-			try {if ( localOut != null ) localOut.close();}
-			catch ( IOException e ) {}
+			try {
+				if ( localOut != null ) localOut.close();
+			}
+			catch ( IOException e ) {
+			}
 
-			try {httpClient.close();}
-			catch ( IOException e ) {}
+			try {
+				httpClient.close();
+			}
+			catch ( IOException e ) {
+			}
 		}
 
 		if ( remoteETag != null ) {

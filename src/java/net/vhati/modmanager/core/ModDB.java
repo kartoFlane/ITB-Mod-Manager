@@ -9,18 +9,18 @@ import net.vhati.modmanager.core.ModInfo;
 import net.vhati.modmanager.core.ModsInfo;
 
 
-public class ModDB {
-
+public class ModDB
+{
 	public static final String EXACT = "exact";
 	public static final String FUZZY = "fuzzy";
 
+	private HashMap<String, String> threadHashMap = new HashMap<>();
 
-	private HashMap<String,String> threadHashMap = new HashMap<String,String>();
-
-	private List<ModInfo> catalog = new ArrayList<ModInfo>();
+	private List<ModInfo> catalog = new ArrayList<>();
 
 
-	public ModDB() {
+	public ModDB()
+	{
 	}
 
 	/**
@@ -28,7 +28,8 @@ public class ModDB {
 	 *
 	 * Different catalog list, same ModInfos.
 	 */
-	public ModDB( ModDB srcDB ) {
+	public ModDB( ModDB srcDB )
+	{
 		threadHashMap.putAll( srcDB.getThreadHashMap() );
 		catalog.addAll( srcDB.getCatalog() );
 	}
@@ -37,22 +38,25 @@ public class ModDB {
 	/**
 	 * Returns mod info for a given file hash.
 	 */
-	public ModInfo getModInfo( String hash ) {
+	public ModInfo getModInfo( String hash )
+	{
 		if ( hash == null ) return null;
 
 		for ( ModInfo modInfo : catalog ) {
-			if ( modInfo.getFileHash().equals(hash) ) {
+			if ( modInfo.getFileHash().equals( hash ) ) {
 				return modInfo;
 			}
 		}
 		return null;
 	}
 
-	public void addMod( ModInfo modInfo ) {
+	public void addMod( ModInfo modInfo )
+	{
 		catalog.add( modInfo );
 	}
 
-	public void removeMod( ModInfo modInfo ) {
+	public void removeMod( ModInfo modInfo )
+	{
 		catalog.remove( modInfo );
 	}
 
@@ -60,15 +64,18 @@ public class ModDB {
 	/**
 	 * Stores the first-post content hash of a forum thread.
 	 */
-	public void putThreadHash( String url, String threadHash ) {
+	public void putThreadHash( String url, String threadHash )
+	{
 		threadHashMap.put( url, threadHash );
 	}
 
-	public String getThreadHash( String url ) {
+	public String getThreadHash( String url )
+	{
 		return threadHashMap.get( url );
 	}
 
-	public void clear() {
+	public void clear()
+	{
 		threadHashMap.clear();
 		catalog.clear();
 	}
@@ -77,14 +84,16 @@ public class ModDB {
 	/**
 	 * Returns the internal Map of forum thread urls and hashes of their first posts' content.
 	 */
-	public Map<String,String> getThreadHashMap() {
+	public Map<String, String> getThreadHashMap()
+	{
 		return threadHashMap;
 	}
 
 	/**
 	 * Returns the internal List of mod info.
 	 */
-	public List<ModInfo> getCatalog() {
+	public List<ModInfo> getCatalog()
+	{
 		return catalog;
 	}
 
@@ -98,10 +107,11 @@ public class ModDB {
 	 *   EXACT - All attributes match (excluding fileHash/fileVersion).
 	 *   FUZZY - Title and URL match, but not everything.
 	 */
-	public HashMap<String,List<ModInfo>> getSimilarMods( ModInfo modInfo ) {
-		HashMap<String,List<ModInfo>> resultsMap = new HashMap<String,List<ModInfo>>();
-		resultsMap.put( EXACT, new ArrayList<ModInfo>() );
-		resultsMap.put( FUZZY, new ArrayList<ModInfo>() );
+	public HashMap<String, List<ModInfo>> getSimilarMods( ModInfo modInfo )
+	{
+		HashMap<String, List<ModInfo>> resultsMap = new HashMap<>();
+		resultsMap.put( EXACT, new ArrayList<>() );
+		resultsMap.put( FUZZY, new ArrayList<>() );
 
 		for ( ModInfo altInfo : catalog ) {
 			if ( altInfo.getTitle().equals( modInfo.getTitle() ) ) {
@@ -125,9 +135,10 @@ public class ModDB {
 	/**
 	 * Collects ModInfo objects that differ only in version, and creates ModsInfo objects.
 	 */
-	public List<ModsInfo> getCollatedModInfo() {
-		List<ModsInfo> results = new ArrayList<ModsInfo>();
-		List<ModInfo> seenList = new ArrayList<ModInfo>();
+	public List<ModsInfo> getCollatedModInfo()
+	{
+		List<ModsInfo> results = new ArrayList<>();
+		List<ModInfo> seenList = new ArrayList<>();
 
 		for ( ModInfo modInfo : catalog ) {
 			if ( seenList.contains( modInfo ) ) continue;
@@ -144,7 +155,7 @@ public class ModDB {
 
 			modsInfo.putVersion( modInfo.getFileHash(), modInfo.getVersion() );
 
-			Map<String,List<ModInfo>> similarMods = getSimilarMods( modInfo );
+			Map<String, List<ModInfo>> similarMods = getSimilarMods( modInfo );
 			for ( ModInfo altInfo : similarMods.get( ModDB.EXACT ) ) {
 				if ( seenList.contains( altInfo ) ) continue;
 				seenList.add( altInfo );

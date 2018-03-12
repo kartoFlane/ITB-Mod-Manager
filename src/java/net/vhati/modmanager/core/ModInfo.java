@@ -1,7 +1,8 @@
 package net.vhati.modmanager.core;
 
 
-public class ModInfo {
+public class ModInfo
+{
 	private String title = "???";
 	private String author = "???";
 	private String url = "???";
@@ -24,11 +25,12 @@ public class ModInfo {
 	public String getFileHash() { return this.fileHash; }
 	public String getVersion() { return this.version; }
 
-
+	
 	/**
 	 * Returns true if all fields, aside from fileHash, are "???".
 	 */
-	public boolean isBlank() {
+	public boolean isBlank()
+	{
 		if ( !getTitle().equals( "???" ) ) return false;
 		if ( !getAuthor().equals( "???" ) ) return false;
 		if ( !getURL().equals( "???" ) ) return false;
@@ -37,14 +39,15 @@ public class ModInfo {
 		return true;
 	}
 
-
 	@Override
-	public String toString() {
+	public String toString()
+	{
 		return getTitle();
 	}
 
 	@Override
-	public boolean equals( Object o ) {
+	public boolean equals( Object o )
+	{
 		if ( o == null ) return false;
 		if ( o == this ) return true;
 		if ( o instanceof ModInfo == false ) return false;
@@ -60,7 +63,8 @@ public class ModInfo {
 	}
 
 	@Override
-	public int hashCode() {
+	public int hashCode()
+	{
 		int result = 79;
 		int salt = 35;
 

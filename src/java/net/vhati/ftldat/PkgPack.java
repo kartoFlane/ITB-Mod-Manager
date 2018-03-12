@@ -2,12 +2,11 @@ package net.vhati.ftldat;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
@@ -21,12 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.DeflaterInputStream;
 import java.util.zip.InflaterInputStream;
-
-import net.vhati.ftldat.AbstractPack;
-import net.vhati.ftldat.AbstractPack.PathAndSize;
-import net.vhati.ftldat.AbstractPack.RepackResult;
-import net.vhati.ftldat.FileChannelRegionInputStream;
-import net.vhati.ftldat.MeteredInputStream;
 
 
 /**
@@ -49,8 +42,8 @@ import net.vhati.ftldat.MeteredInputStream;
  *
  * This was introduced in FTL 1.6.1.
  */
-public class PkgPack extends AbstractPack {
-
+public class PkgPack extends AbstractPack
+{
 	/** Bitmask flag for "deflate" compression. */
 	private static final long PKGF_DEFLATED = 1 << 24;
 
@@ -63,7 +56,7 @@ public class PkgPack extends AbstractPack {
 	/** Byte count to pre-allocate per innerPath in newly created dats. */
 	private static final int TYPICAL_PATH_LENGTH = 70;
 
-	private final int[] signature = new int[] {0x50, 0x4B, 0x47, 0x0A};  // "PKG\n"
+	private final int[] signature = new int[] { 0x50, 0x4B, 0x47, 0x0A };  // "PKG\n"
 
 	private CharsetEncoder asciiEncoder = Charset.forName( "US-ASCII" ).newEncoder();
 
@@ -85,7 +78,8 @@ public class PkgPack extends AbstractPack {
 	 *
 	 * @see FTLPack(File datFile, String mode, int indexSize)
 	 */
-	public PkgPack( File datFile, String mode ) throws IOException {
+	public PkgPack( File datFile, String mode ) throws IOException
+	{
 		this( datFile, mode, 2048 );
 	}
 
@@ -97,11 +91,15 @@ public class PkgPack extends AbstractPack {
 	 *   r+ - opens an existing dat, read/write.
 	 *   w+ - creates a new empty dat, read/write.
 	 *
-	 * @param datFile a file to open/create
-	 * @param mode see above
-	 * @param entryCount size of the initial index if creating
+	 * @param datFile
+	 *            a file to open/create
+	 * @param mode
+	 *            see above
+	 * @param entryCount
+	 *            size of the initial index if creating
 	 */
-	public PkgPack( File datFile, String mode, int entryCount ) throws IOException {
+	public PkgPack( File datFile, String mode, int entryCount ) throws IOException
+	{
 		bigByteBuf = ByteBuffer.allocate( TYPICAL_PATH_LENGTH * 3000 );  // Arbitrary default.
 
 		// A reusable buffer large enough for the unsigned read methods.
@@ -136,7 +134,8 @@ public class PkgPack extends AbstractPack {
 	/**
 	 * Toggles whether subsequent add() calls should compress data.
 	 */
-	public void setCompressNewAdditions( boolean b ) {
+	public void setCompressNewAdditions( boolean b )
+	{
 		compressNewAdditions = b;
 	}
 
@@ -155,14 +154,16 @@ public class PkgPack extends AbstractPack {
 	 * See SIL's "package-pkg.h:pkg_hash()".
 	 * http://achurch.org/SIL/current/src/resource/package-pkg.h
 	 *
-	 * @param innerPath an ASCII string
+	 * @param innerPath
+	 *            an ASCII string
 	 */
-	public long calculatePathHash( String innerPath ) {
+	public long calculatePathHash( String innerPath )
+	{
 		// Casting a character to int emulates ord(), to get the numeric ASCII value.
 		int len = innerPath.length();
 		long hash = 0;
 		if ( innerPath != null ) {
-			for ( int i=0; i < len; i++ ) {
+			for ( int i = 0; i < len; i++ ) {
 				long n = (int)Character.toLowerCase( innerPath.charAt( i ) );
 				hash = hash << 27 | hash >>> 5;
 				hash ^= n;
@@ -179,17 +180,19 @@ public class PkgPack extends AbstractPack {
 	 * A newly allocated buffer will have minCapacity or more.
 	 * Either way, treat this as a new buffer (set limit, byte order, etc).
 	 */
-	private boolean recycleBigByteBuffer( int minCapacity ) {
+	private boolean recycleBigByteBuffer( int minCapacity )
+	{
 		if ( bigByteBuf.capacity() >= minCapacity ) {
 			bigByteBuf.clear();
 			return true;
 		}
 
 		int newCapacity = 0;
-		int incrementalCapacity = bigByteBuf.capacity() + bigByteBuf.capacity()/2;
+		int incrementalCapacity = bigByteBuf.capacity() + bigByteBuf.capacity() / 2;
 		if ( incrementalCapacity >= minCapacity ) {
 			newCapacity = incrementalCapacity;
-		} else {
+		}
+		else {
 			newCapacity = minCapacity;
 		}
 		bigByteBuf = ByteBuffer.allocate( newCapacity );
@@ -203,7 +206,8 @@ public class PkgPack extends AbstractPack {
 	 * Java doesn't have an unsigned int primitive,
 	 * so a long holds the value instead.
 	 */
-	private long readBigUInt() throws IOException {
+	private long readBigUInt() throws IOException
+	{
 		smallByteBuf.clear();
 		raf.readFully( smallByteBuf.array(), 0, 4 );
 
@@ -215,12 +219,13 @@ public class PkgPack extends AbstractPack {
 		return result;
 	}
 
-	private void writeBigUInt( long n ) throws IOException {
+	private void writeBigUInt( long n ) throws IOException
+	{
 		smallByteBuf.clear();
 
 		// Write a signed int, after discarding sign
 		// by casting from long and hacking off bits.
-		smallByteBuf.putInt( 0, (int)(n & 0x00000000FFFFFFFFL) );
+		smallByteBuf.putInt( 0, (int)( n & 0x00000000FFFFFFFFL ) );
 
 		raf.write( smallByteBuf.array(), 0, 4 );
 	}
@@ -231,7 +236,8 @@ public class PkgPack extends AbstractPack {
 	 * Java doesn't have an unsigned short primitive,
 	 * so an int holds the value instead.
 	 */
-	private int readBigUShort() throws IOException {
+	private int readBigUShort() throws IOException
+	{
 		smallByteBuf.clear();
 		raf.readFully( smallByteBuf.array(), 0, 2 );
 
@@ -243,12 +249,13 @@ public class PkgPack extends AbstractPack {
 		return result;
 	}
 
-	private void writeBigUShort( int n ) throws IOException {
+	private void writeBigUShort( int n ) throws IOException
+	{
 		smallByteBuf.clear();
 
 		// Write a signed short, after discarding sign
 		// by casting from int and hacking off bits.
-		smallByteBuf.putShort( 0, (short)(n & 0x0000FFFF) );
+		smallByteBuf.putShort( 0, (short)( n & 0x0000FFFF ) );
 
 		raf.write( smallByteBuf.array(), 0, 2 );
 	}
@@ -259,7 +266,8 @@ public class PkgPack extends AbstractPack {
 	 * Reading begins at the buffer's current position.
 	 * The buffer's limit is honored.
 	 */
-	private String readNullTerminatedString( ByteBuffer srcBuf ) throws IOException {
+	private String readNullTerminatedString( ByteBuffer srcBuf ) throws IOException
+	{
 		StringBuilder result = new StringBuilder();
 
 		while ( srcBuf.hasRemaining() ) {
@@ -275,9 +283,10 @@ public class PkgPack extends AbstractPack {
 		return result.toString();
 	}
 
-	private int writeNullTerminatedString( ByteBuffer dstBuf, CharSequence s ) throws IOException {
+	private int writeNullTerminatedString( ByteBuffer dstBuf, CharSequence s ) throws IOException
+	{
 		if ( !asciiEncoder.reset().canEncode( s ) ) {
-			throw new IllegalArgumentException( "The PKG format does not support non-ascii characters: "+ s );
+			throw new IllegalArgumentException( "The PKG format does not support non-ascii characters: " + s );
 		}
 
 		int start = dstBuf.position();
@@ -285,18 +294,19 @@ public class PkgPack extends AbstractPack {
 		asciiEncoder.reset();
 		CoderResult r = asciiEncoder.encode( cBuf, dstBuf, true );
 		if ( r.isOverflow() ) {
-			throw new IOException( "Buffer overflow while encoding string: "+ s );
+			throw new IOException( "Buffer overflow while encoding string: " + s );
 		}
 		asciiEncoder.flush( dstBuf );
 		if ( r.isOverflow() ) {
-			throw new IOException( "Buffer overflow while encoding string: "+ s );
+			throw new IOException( "Buffer overflow while encoding string: " + s );
 		}
 		dstBuf.put( (byte)0 );
 
 		return dstBuf.position() - start;
 	}
 
-	private void writePkgEntry( PkgEntry entry ) throws IOException {
+	private void writePkgEntry( PkgEntry entry ) throws IOException
+	{
 		if ( entry == null ) {
 			writeBigUInt( 0 );  // Hash.
 			writeBigUInt( 0 );  // pathOffsetAndFlags.
@@ -324,10 +334,11 @@ public class PkgPack extends AbstractPack {
 	 * When null is returned, newly added data should be written at the end of
 	 * the file.
 	 */
-	private PkgEntry getEntryWithEarliestData() {
+	private PkgEntry getEntryWithEarliestData()
+	{
 		PkgEntry result = null;
 		for ( PkgEntry entry : entryList ) {
-			if ( entry != null && (result == null || entry.dataOffset < result.dataOffset) ) {
+			if ( entry != null && ( result == null || entry.dataOffset < result.dataOffset ) ) {
 				result = entry;
 			}
 		}
@@ -340,11 +351,12 @@ public class PkgPack extends AbstractPack {
 	 *
 	 * This will be after the last innerPath's null-terminated string.
 	 */
-	private int getNextInnerPathOffset() {
+	private int getNextInnerPathOffset()
+	{
 		int result = 0;
 		PkgEntry foundEntry = null;
 		for ( PkgEntry entry : entryList ) {
-			if ( entry != null && (foundEntry == null || entry.innerPathOffset > foundEntry.innerPathOffset) ) {
+			if ( entry != null && ( foundEntry == null || entry.innerPathOffset > foundEntry.innerPathOffset ) ) {
 				foundEntry = entry;
 			}
 		}
@@ -355,12 +367,13 @@ public class PkgPack extends AbstractPack {
 		return result;
 	}
 
-	private void createIndex( int entryCount ) throws IOException {
+	private void createIndex( int entryCount ) throws IOException
+	{
 		pathsRegionSize = 0;
 
-		entryList = new ArrayList<PkgEntry>( entryCount );
+		entryList = new ArrayList<>( entryCount );
 
-		pathToIndexMap = new HashMap<String, Integer>( entryCount );
+		pathToIndexMap = new HashMap<>( entryCount );
 
 		raf.seek( 0 );
 		raf.setLength( 0 );
@@ -375,7 +388,8 @@ public class PkgPack extends AbstractPack {
 		growIndex( entryCount );
 	}
 
-	private void readIndex()  throws IOException {
+	private void readIndex() throws IOException
+	{
 		raf.seek( 0 );
 
 		// Check the file signature.
@@ -388,23 +402,29 @@ public class PkgPack extends AbstractPack {
 		// Other header values.
 		int headerSize = readBigUShort();
 		if ( headerSize != HEADER_SIZE ) {
-			throw new IOException( String.format( "Corrupt dat file (%s): header claims header size is %d bytes (expected %d)", getName(), headerSize, HEADER_SIZE ) );
+			throw new IOException(
+				String.format( "Corrupt dat file (%s): header claims header size is %d bytes (expected %d)", getName(), headerSize, HEADER_SIZE )
+			);
 		}
 		int entrySize = readBigUShort();
 		if ( entrySize != ENTRY_SIZE ) {
-			throw new IOException( String.format( "Corrupt dat file (%s): header claims entries are %d bytes (expected %d)", getName(), entrySize, ENTRY_SIZE ) );
+			throw new IOException(
+				String.format( "Corrupt dat file (%s): header claims entries are %d bytes (expected %d)", getName(), entrySize, ENTRY_SIZE )
+			);
 		}
 		int entryCount = (int)readBigUInt();   // Risky casting to signed.
 		if ( entryCount * entrySize > raf.length() ) {
-			throw new IOException( String.format( "Corrupt dat file (%s): header claims entries combined are larger than the entire file", getName() ) );
+			throw new IOException(
+				String.format( "Corrupt dat file (%s): header claims entries combined are larger than the entire file", getName() )
+			);
 		}
 		pathsRegionSize = (int)readBigUInt();  // Risky casting to signed.
 		if ( pathsRegionSize > raf.length() ) {
 			throw new IOException( String.format( "Corrupt dat file (%s): header claims path strings are larger than the entire file", getName() ) );
 		}
 
-		entryList = new ArrayList<PkgEntry>( entryCount );
-		for ( int i=0; i < entryCount; i++ ) {
+		entryList = new ArrayList<>( entryCount );
+		for ( int i = 0; i < entryCount; i++ ) {
 			PkgEntry entry = new PkgEntry();
 			entry.innerPathHash = readBigUInt();
 
@@ -412,8 +432,8 @@ public class PkgPack extends AbstractPack {
 			// 0x00FFFFFF == 0000 0000:1111 1111 1111 1111 1111 1111 (8:24 bits).
 			// 1 << 24    == 0000 0001:0000 0000 0000 0000 0000 0000
 			long pathOffsetAndFlags = readBigUInt();
-			entry.innerPathOffset = (int)(pathOffsetAndFlags & 0x00FFFFFFL);
-			entry.dataDeflated = ((pathOffsetAndFlags & PKGF_DEFLATED) != 0);
+			entry.innerPathOffset = (int)( pathOffsetAndFlags & 0x00FFFFFFL );
+			entry.dataDeflated = ( ( pathOffsetAndFlags & PKGF_DEFLATED ) != 0 );
 
 			entry.dataOffset = readBigUInt();
 			entry.dataSize = readBigUInt();
@@ -421,18 +441,19 @@ public class PkgPack extends AbstractPack {
 
 			if ( entry.dataOffset == 0 ) {  // Null entry, dat wasn't repacked.
 				entryList.add( null );
-			} else {
+			}
+			else {
 				entryList.add( entry );
 			}
 		}
 
-		pathToIndexMap = new HashMap<String, Integer>( entryCount );
+		pathToIndexMap = new HashMap<>( entryCount );
 
 		recycleBigByteBuffer( pathsRegionSize );
 		bigByteBuf.limit( pathsRegionSize );
 		raf.readFully( bigByteBuf.array(), 0, pathsRegionSize );
 
-		for ( int i=0; i < entryCount; i++ ) {
+		for ( int i = 0; i < entryCount; i++ ) {
 			PkgEntry entry = entryList.get( i );
 			if ( entry == null ) continue;
 
@@ -452,7 +473,8 @@ public class PkgPack extends AbstractPack {
 	 * After returning, if this was the earliest dataOffset, there will be a
 	 * gap between the paths region and the new earliest data.
 	 */
-	private void moveEntryDataToEOF( PkgEntry entry ) throws IOException {
+	private void moveEntryDataToEOF( PkgEntry entry ) throws IOException
+	{
 		long oldOffset = entry.dataOffset;
 		long newOffset = raf.length();
 
@@ -464,7 +486,7 @@ public class PkgPack extends AbstractPack {
 			raf.seek( oldOffset + totalBytes - bytesRemaining );
 			len = raf.read( buf, 0, (int)Math.min( buf.length, bytesRemaining ) );
 			if ( len == -1 ) {
-				throw new IOException( "EOF prematurely reached reading innerPath: "+  entry.innerPath );
+				throw new IOException( "EOF prematurely reached reading innerPath: " + entry.innerPath );
 			}
 
 			raf.seek( newOffset + totalBytes - bytesRemaining );
@@ -484,7 +506,8 @@ public class PkgPack extends AbstractPack {
 	 * to the end of the file. The region it used to occupy can then
 	 * be filled with additional indeces.
 	 */
-	private void growIndex( int amount ) throws IOException {
+	private void growIndex( int amount ) throws IOException
+	{
 		long neededEntriesGrowth = amount * ENTRY_SIZE;
 		int neededPathsRegionGrowth = amount * TYPICAL_PATH_LENGTH;
 
@@ -521,7 +544,7 @@ public class PkgPack extends AbstractPack {
 		bigByteBuf.limit( neededPathsRegionSize );
 
 		raf.readFully( bigByteBuf.array(), 0, pathsRegionSize );
-		Arrays.fill( bigByteBuf.array(), pathsRegionSize+1, neededPathsRegionSize, (byte)0 );
+		Arrays.fill( bigByteBuf.array(), pathsRegionSize + 1, neededPathsRegionSize, (byte)0 );
 		bigByteBuf.rewind();  // The backing array was modified directly, so this is a NOP.
 
 		raf.seek( neededPathsRegionOffset );  // Seeking past EOF is okay; write() will grow the file.
@@ -530,11 +553,11 @@ public class PkgPack extends AbstractPack {
 		pathsRegionSize = neededPathsRegionSize;
 
 		// Add/write the grown entries.
-		for ( int i=0; i < amount; i++ ) {
+		for ( int i = 0; i < amount; i++ ) {
 			entryList.add( null );
 		}
 		raf.seek( firstGrowthEntryOffset );
-		for ( int i=0; i < amount; i++ ) {
+		for ( int i = 0; i < amount; i++ ) {
 			writePkgEntry( null );
 		}
 
@@ -545,20 +568,23 @@ public class PkgPack extends AbstractPack {
 	}
 
 	@Override
-	public String getName() {
+	public String getName()
+	{
 		return datFile.getName();
 	}
 
 	@Override
-	public List<String> list() {
-		List<String> result = new ArrayList<String>();
+	public List<String> list()
+	{
+		List<String> result = new ArrayList<>();
 		result.addAll( pathToIndexMap.keySet() );
 		return result;
 	}
 
 	@Override
-	public List<PathAndSize> listSizes() {
-		List<PathAndSize> result = new ArrayList<PathAndSize>();
+	public List<PathAndSize> listSizes()
+	{
+		List<PathAndSize> result = new ArrayList<>();
 		for ( PkgEntry entry : entryList ) {
 			if ( entry == null ) continue;
 			PathAndSize pas = new PathAndSize( entry.innerPath, entry.dataSize );
@@ -571,15 +597,16 @@ public class PkgPack extends AbstractPack {
 	 * Adds bytes read from an InputStream to the pack, as innerPath.
 	 */
 	@Override
-	public void add( String innerPath, InputStream is ) throws IOException {
+	public void add( String innerPath, InputStream is ) throws IOException
+	{
 		if ( innerPath.contains( "\\" ) ) {
-			throw new IllegalArgumentException( "InnerPath contains backslashes: "+ innerPath );
+			throw new IllegalArgumentException( "InnerPath contains backslashes: " + innerPath );
 		}
 		if ( pathToIndexMap.containsKey( innerPath ) ) {
-			throw new IOException( "InnerPath already exists: "+ innerPath );
+			throw new IOException( "InnerPath already exists: " + innerPath );
 		}
 		if ( !asciiEncoder.reset().canEncode( innerPath ) ) {
-			throw new IllegalArgumentException( "InnerPath contains non-ascii characters: "+ innerPath );
+			throw new IllegalArgumentException( "InnerPath contains non-ascii characters: " + innerPath );
 		}
 
 		// Find a vacancy in the header, or create one.
@@ -591,7 +618,7 @@ public class PkgPack extends AbstractPack {
 
 		// Make room for the innerPath null-terminated string.
 		int innerPathOffset = getNextInnerPathOffset();
-		while ( innerPathOffset + innerPath.length() + 1  > pathsRegionSize ) {
+		while ( innerPathOffset + innerPath.length() + 1 > pathsRegionSize ) {
 			growIndex( 50 );
 		}
 
@@ -615,7 +642,7 @@ public class PkgPack extends AbstractPack {
 		raf.seek( entry.dataOffset );
 		byte[] buf = new byte[4096];
 		int len;
-		while ( (len = dataStream.read( buf )) >= 0 ) {
+		while ( ( len = dataStream.read( buf ) ) >= 0 ) {
 			raf.write( buf, 0, len );
 		}
 
@@ -645,7 +672,8 @@ public class PkgPack extends AbstractPack {
 	}
 
 	@Override
-	public void extractTo( String innerPath, OutputStream os ) throws FileNotFoundException, IOException {
+	public void extractTo( String innerPath, OutputStream os ) throws FileNotFoundException, IOException
+	{
 		InputStream is = null;
 
 		try {
@@ -653,23 +681,27 @@ public class PkgPack extends AbstractPack {
 
 			byte[] buf = new byte[4096];
 			int len;
-			while ( (len = is.read( buf )) >= 0 ) {
+			while ( ( len = is.read( buf ) ) >= 0 ) {
 				os.write( buf, 0, len );
 			}
 		}
 		finally {
-			try {if ( is != null ) is.close();}
-			catch ( IOException e ) {}
+			try {
+				if ( is != null ) is.close();
+			}
+			catch ( IOException e ) {
+			}
 		}
 	}
 
 	@Override
-	public void remove( String innerPath ) throws FileNotFoundException, IOException {
+	public void remove( String innerPath ) throws FileNotFoundException, IOException
+	{
 		if ( innerPath.contains( "\\" ) ) {
-			throw new IllegalArgumentException( "InnerPath contains backslashes: "+ innerPath );
+			throw new IllegalArgumentException( "InnerPath contains backslashes: " + innerPath );
 		}
 		if ( !pathToIndexMap.containsKey( innerPath ) ) {
-			throw new FileNotFoundException( "InnerPath does not exist: "+ innerPath );
+			throw new FileNotFoundException( "InnerPath does not exist: " + innerPath );
 		}
 
 		int entryIndex = pathToIndexMap.get( innerPath ).intValue();
@@ -686,20 +718,22 @@ public class PkgPack extends AbstractPack {
 	}
 
 	@Override
-	public boolean contains( String innerPath ) {
+	public boolean contains( String innerPath )
+	{
 		if ( innerPath.contains( "\\" ) ) {
-			throw new IllegalArgumentException( "InnerPath contains backslashes: "+ innerPath );
+			throw new IllegalArgumentException( "InnerPath contains backslashes: " + innerPath );
 		}
 		return pathToIndexMap.containsKey( innerPath );
 	}
 
 	@Override
-	public InputStream getInputStream( String innerPath ) throws FileNotFoundException, IOException {
+	public InputStream getInputStream( String innerPath ) throws FileNotFoundException, IOException
+	{
 		if ( innerPath.contains( "\\" ) ) {
-			throw new IllegalArgumentException( "InnerPath contains backslashes: "+ innerPath );
+			throw new IllegalArgumentException( "InnerPath contains backslashes: " + innerPath );
 		}
 		if ( !pathToIndexMap.containsKey( innerPath ) ) {
-			throw new FileNotFoundException( "InnerPath does not exist: "+ innerPath );
+			throw new FileNotFoundException( "InnerPath does not exist: " + innerPath );
 		}
 
 		int entryIndex = pathToIndexMap.get( innerPath ).intValue();
@@ -717,12 +751,14 @@ public class PkgPack extends AbstractPack {
 	}
 
 	@Override
-	public void close() throws IOException {
+	public void close() throws IOException
+	{
 		raf.close();
 	}
 
-	public List<PkgEntry> listMetadata() {
-		return new ArrayList<PkgEntry>( entryList );
+	public List<PkgEntry> listMetadata()
+	{
+		return new ArrayList<>( entryList );
 	}
 
 	/**
@@ -737,24 +773,27 @@ public class PkgPack extends AbstractPack {
 	 * dataOffset.
 	 */
 	@Override
-	public RepackResult repack() throws IOException {
+	public RepackResult repack() throws IOException
+	{
 		long bytesChanged = 0;
 
 		int vacancyCount = Collections.frequency( entryList, null );
 
 		// Build a list of non-null entries, sorted in the order their data appears.
 
-		List<PkgEntry> tmpEntries = new ArrayList<PkgEntry>( entryList.size() - vacancyCount );
+		List<PkgEntry> tmpEntries = new ArrayList<>( entryList.size() - vacancyCount );
 		for ( PkgEntry entry : entryList ) {
 			if ( entry != null ) tmpEntries.add( entry );
 		}
 		Collections.sort( tmpEntries, new PkgEntryDataOffsetComparator() );
 
-		for ( int i=0; i < tmpEntries.size()-1; i++ ) {
+		for ( int i = 0; i < tmpEntries.size() - 1; i++ ) {
 			PkgEntry a = tmpEntries.get( i );
-			PkgEntry b = tmpEntries.get( i+1 );
-			if ( a.dataOffset+a.dataSize > b.dataOffset ) {
-				throw new IOException( String.format( "Cannot repack datfile with overlapping entries (\"%s\" and \"%s\")", a.innerPath, b.innerPath ) );
+			PkgEntry b = tmpEntries.get( i + 1 );
+			if ( a.dataOffset + a.dataSize > b.dataOffset ) {
+				throw new IOException(
+					String.format( "Cannot repack datfile with overlapping entries (\"%s\" and \"%s\")", a.innerPath, b.innerPath )
+				);
 			}
 		}
 
@@ -817,7 +856,7 @@ public class PkgPack extends AbstractPack {
 					raf.seek( entry.dataOffset + totalBytes - bytesRemaining );
 					len = raf.read( buf, 0, (int)Math.min( buf.length, bytesRemaining ) );
 					if ( len == -1 ) {
-						throw new IOException( "EOF prematurely reached reading innerPath: "+ entry.innerPath );
+						throw new IOException( "EOF prematurely reached reading innerPath: " + entry.innerPath );
 					}
 
 					raf.seek( pendingDataOffset + totalBytes - bytesRemaining );
@@ -860,11 +899,11 @@ public class PkgPack extends AbstractPack {
 	}
 
 
-
 	/**
 	 * Information about an innerFile within a dat.
 	 */
-	public static class PkgEntry {
+	public static class PkgEntry
+	{
 		/** Offset to read a null-terminated string from the dat's paths blob. */
 		public int innerPathOffset = 0;
 
@@ -873,6 +912,7 @@ public class PkgPack extends AbstractPack {
 
 		/**
 		 * A precalculated hash of the innerPath string.
+		 * 
 		 * @see #calculatePathHash(String)
 		 */
 		public long innerPathHash = 0;
@@ -889,26 +929,31 @@ public class PkgPack extends AbstractPack {
 		/** Whether the packed data is "deflate" ompressed. */
 		public boolean dataDeflated = false;
 
-		public PkgEntry() {
+
+		public PkgEntry()
+		{
 		}
 	}
-
 
 
 	/**
 	 * A Comparator to sort by innerPathHash (asc), then by innerPath (asc) ignoring case.
 	 */
-	public static class PkgEntryHashComparator implements Comparator<PkgEntry> {
+	public static class PkgEntryHashComparator implements Comparator<PkgEntry>
+	{
 		@Override
-		public int compare( PkgEntry a, PkgEntry b ) {
+		public int compare( PkgEntry a, PkgEntry b )
+		{
 			if ( b == null ) return -1;
 			if ( a == null ) return 1;
 			if ( a.innerPathHash < b.innerPathHash ) return -1;
 			if ( a.innerPathHash > b.innerPathHash ) return 1;
 			return a.innerPath.compareToIgnoreCase( b.innerPath );
 		}
+
 		@Override
-		public boolean equals( Object o ) {
+		public boolean equals( Object o )
+		{
 			return ( o != null ? o == this : false );
 		}
 	}
@@ -916,17 +961,21 @@ public class PkgPack extends AbstractPack {
 	/**
 	 * A Comparator to sort by dataOffset (asc).
 	 */
-	public static class PkgEntryDataOffsetComparator implements Comparator<PkgEntry> {
+	public static class PkgEntryDataOffsetComparator implements Comparator<PkgEntry>
+	{
 		@Override
-		public int compare( PkgEntry a, PkgEntry b ) {
+		public int compare( PkgEntry a, PkgEntry b )
+		{
 			if ( b == null ) return -1;
 			if ( a == null ) return 1;
 			if ( a.dataOffset < b.dataOffset ) return -1;
 			if ( a.dataOffset > b.dataOffset ) return 1;
 			return 0;
 		}
+
 		@Override
-		public boolean equals( Object o ) {
+		public boolean equals( Object o )
+		{
 			return ( o != null ? o == this : false );
 		}
 	}

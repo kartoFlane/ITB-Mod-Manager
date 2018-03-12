@@ -2,14 +2,12 @@ package net.vhati.ftldat;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-//import java.nio.MappedByteBuffer;      // For Memory-mapped streams
-//import java.nio.channels.FileChannel;  // For Memory-mapped streams
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
@@ -19,11 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.vhati.ftldat.AbstractPack;
-import net.vhati.ftldat.AbstractPack.PathAndSize;
-import net.vhati.ftldat.AbstractPack.RepackResult;
-import net.vhati.ftldat.FileChannelRegionInputStream;
-
 
 /**
  * The original format FTL used to store resources.
@@ -32,8 +25,8 @@ import net.vhati.ftldat.FileChannelRegionInputStream;
  *   Index = A count, followed by a series of offsets to entries.
  *   Entries = A series of {dataSize, innerPath, data} hunks.
  */
-public class FTLPack extends AbstractPack {
-
+public class FTLPack extends AbstractPack
+{
 	private CharsetEncoder asciiEncoder = Charset.forName( "US-ASCII" ).newEncoder();
 
 	private ByteBuffer byteBuffer = null;
@@ -49,7 +42,8 @@ public class FTLPack extends AbstractPack {
 	 *
 	 * @see FTLPack(File datFile, String mode, int indexSize)
 	 */
-	public FTLPack( File datFile, String mode ) throws IOException {
+	public FTLPack( File datFile, String mode ) throws IOException
+	{
 		this( datFile, mode, 2048 );
 	}
 
@@ -61,11 +55,15 @@ public class FTLPack extends AbstractPack {
 	 *   r+ - opens an existing dat, read/write.
 	 *   w+ - creates a new empty dat, read/write.
 	 *
-	 * @param datFile a file to open/create
-	 * @param mode see above
-	 * @param indexSize size of the initial index if creating
+	 * @param datFile
+	 *            a file to open/create
+	 * @param mode
+	 *            see above
+	 * @param indexSize
+	 *            size of the initial index if creating
 	 */
-	public FTLPack( File datFile, String mode, int indexSize ) throws IOException {
+	public FTLPack( File datFile, String mode, int indexSize ) throws IOException
+	{
 		// A reusable buffer large enough for the unsigned read methods.
 		byteBuffer = ByteBuffer.allocate( 4 );
 		byteBuffer.order( ByteOrder.LITTLE_ENDIAN );
@@ -102,7 +100,8 @@ public class FTLPack extends AbstractPack {
 	 * Java doesn't have an unsigned int primitive,
 	 * so a long holds the value instead.
 	 */
-	private long readLittleUInt() throws IOException {
+	private long readLittleUInt() throws IOException
+	{
 		byteBuffer.clear();
 		raf.readFully( byteBuffer.array(), 0, 4 );
 
@@ -114,25 +113,28 @@ public class FTLPack extends AbstractPack {
 		return result;
 	}
 
-	private void writeLittleUInt( long n ) throws IOException {
+	private void writeLittleUInt( long n ) throws IOException
+	{
 		byteBuffer.clear();
 
 		// Write a signed int, after discarding sign
 		// by casting from long and hacking off bits.
-		byteBuffer.putInt( 0, (int)(n & 0x00000000FFFFFFFFL) );
+		byteBuffer.putInt( 0, (int)( n & 0x00000000FFFFFFFFL ) );
 
 		raf.write( byteBuffer.array(), 0, 4 );
 	}
 
-	private String readLittleUString() throws IOException {
+	private String readLittleUString() throws IOException
+	{
 		long strLen = readLittleUInt();
-		byte[] strBytes = new byte[ (int)strLen ];
+		byte[] strBytes = new byte[(int)strLen];
 		raf.readFully( strBytes );
 
 		return new String( strBytes, asciiEncoder.charset().name() );
 	}
 
-	private void writeLittleUString( String s ) throws IOException {
+	private void writeLittleUString( String s ) throws IOException
+	{
 		writeLittleUInt( s.length() );
 		byte[] strBytes = s.getBytes( asciiEncoder.charset().name() );
 		raf.write( strBytes );
@@ -142,28 +144,31 @@ public class FTLPack extends AbstractPack {
 	 * Returns the offset to seek within the header,
 	 * in order to read the data offset of an innerFile entry.
 	 *
-	 * @param n the nth index.
+	 * @param n
+	 *            the nth index.
 	 */
-	private long getHeaderIndexPosition( int n ) {
-		return ( 4 + n*4 );  // 4-byte indexSize + 4-byte indeces.
+	private long getHeaderIndexPosition( int n )
+	{
+		return ( 4 + n * 4 );  // 4-byte indexSize + 4-byte indeces.
 	}
 
 	/**
 	 * Creates a new index.
 	 * WARNING: This will erase the file.
 	 */
-	private void createIndex( int indexSize ) throws IOException {
-		entryList = new ArrayList<DatEntry>( indexSize );
-		for ( int i=0; i < indexSize; i++ ) {
+	private void createIndex( int indexSize ) throws IOException
+	{
+		entryList = new ArrayList<>( indexSize );
+		for ( int i = 0; i < indexSize; i++ ) {
 			entryList.add( null );
 		}
 
-		pathToIndexMap = new HashMap<String, Integer>( indexSize );
+		pathToIndexMap = new HashMap<>( indexSize );
 
 		raf.seek( 0 );
 		raf.setLength( 0 );
 		writeLittleUInt( indexSize );
-		for ( int i=0; i < indexSize; i++ ) {
+		for ( int i = 0; i < indexSize; i++ ) {
 			writeLittleUInt( 0 );
 		}
 	}
@@ -171,22 +176,23 @@ public class FTLPack extends AbstractPack {
 	/**
 	 * Reads (or re-reads) the index from the file.
 	 */
-	private void readIndex() throws IOException {
+	private void readIndex() throws IOException
+	{
 		raf.seek( 0 );
 		int indexSize = (int)readLittleUInt();
 		if ( indexSize * 4 > raf.length() ) {
 			throw new IOException( String.format( "Corrupt dat file (%s): header claims to be larger than the entire file", getName() ) );
 		}
 
-		entryList = new ArrayList<DatEntry>( indexSize );
-		for ( int i=0; i < indexSize; i++ ) {
+		entryList = new ArrayList<>( indexSize );
+		for ( int i = 0; i < indexSize; i++ ) {
 			entryList.add( null );
 		}
 
-		pathToIndexMap = new HashMap<String, Integer>( indexSize );
+		pathToIndexMap = new HashMap<>( indexSize );
 
 		// Store partial DatEntry objects in entryList (leaving nulls where absent).
-		for ( int i=0; i < indexSize; i++ ) {
+		for ( int i = 0; i < indexSize; i++ ) {
 			long entryOffset = readLittleUInt();
 
 			if ( entryOffset != 0 ) {
@@ -196,7 +202,7 @@ public class FTLPack extends AbstractPack {
 			}
 		}
 
-		for ( int i=0; i < indexSize; i++ ) {
+		for ( int i = 0; i < indexSize; i++ ) {
 			DatEntry entry = entryList.get( i );
 			if ( entry == null ) continue;
 
@@ -206,7 +212,7 @@ public class FTLPack extends AbstractPack {
 			entry.dataOffset = raf.getChannel().position();
 
 			if ( pathToIndexMap.containsKey( entry.innerPath ) ) {
-				throw new IOException( "InnerPath occurs more than once: "+ entry.innerPath );
+				throw new IOException( "InnerPath occurs more than once: " + entry.innerPath );
 			}
 			pathToIndexMap.put( entry.innerPath, i );
 		}
@@ -217,12 +223,13 @@ public class FTLPack extends AbstractPack {
 	 * It will still be nth in the header, however.
 	 * Used by growIndex().
 	 */
-	private void moveEntryToEOF( int n ) throws IOException {
+	private void moveEntryToEOF( int n ) throws IOException
+	{
 		DatEntry entry = entryList.get( n );
 		long oldOffset = entry.entryOffset;
 		long newOffset = raf.length();
 
-		long totalBytes = (entry.dataOffset-entry.entryOffset) + entry.dataSize;
+		long totalBytes = ( entry.dataOffset - entry.entryOffset ) + entry.dataSize;
 		long bytesRemaining = totalBytes;
 		byte[] buf = new byte[4096];
 		int len;
@@ -230,7 +237,7 @@ public class FTLPack extends AbstractPack {
 			raf.seek( oldOffset + totalBytes - bytesRemaining );
 			len = raf.read( buf, 0, (int)Math.min( buf.length, bytesRemaining ) );
 			if ( len == -1 ) {
-				throw new IOException( "EOF prematurely reached reading innerPath: "+  entry.innerPath );
+				throw new IOException( "EOF prematurely reached reading innerPath: " + entry.innerPath );
 			}
 
 			raf.seek( newOffset + totalBytes - bytesRemaining );
@@ -240,7 +247,7 @@ public class FTLPack extends AbstractPack {
 		// Update the index.
 		raf.seek( getHeaderIndexPosition( n ) );
 		writeLittleUInt( newOffset );
-		entry.dataOffset = ( newOffset + (entry.dataOffset-entry.entryOffset) );
+		entry.dataOffset = ( newOffset + ( entry.dataOffset - entry.entryOffset ) );
 		entry.entryOffset = newOffset;
 	}
 
@@ -251,7 +258,8 @@ public class FTLPack extends AbstractPack {
 	 * to the end of the file. The region it used to occupy can then
 	 * be filled with additional indeces.
 	 */
-	private void growIndex( int amount ) throws IOException {
+	private void growIndex( int amount ) throws IOException
+	{
 		int freeRoom = -1;
 
 		while ( true ) {
@@ -267,7 +275,7 @@ public class FTLPack extends AbstractPack {
 				// Find the used index with the lowest entryOffset.
 				int earliestUsedIndex = -1;
 				long minEntryOffset = Long.MAX_VALUE;
-				for ( int i=0; i < entryList.size(); i++ ) {
+				for ( int i = 0; i < entryList.size(); i++ ) {
 					DatEntry entry = entryList.get( i );
 					if ( entry.entryOffset < minEntryOffset ) {
 						earliestUsedIndex = i;
@@ -287,32 +295,35 @@ public class FTLPack extends AbstractPack {
 			}
 		}
 		// Expand the header to claim the vacated region.
-		for ( int i=0; i < freeRoom; i++ ) {
+		for ( int i = 0; i < freeRoom; i++ ) {
 			entryList.add( null );
 		}
 		raf.seek( 0 );
 		writeLittleUInt( entryList.size() );
-		raf.seek( getHeaderIndexPosition(entryList.size() - freeRoom) );
-		for ( int i=0; i < freeRoom; i++ ) {
+		raf.seek( getHeaderIndexPosition( entryList.size() - freeRoom ) );
+		for ( int i = 0; i < freeRoom; i++ ) {
 			writeLittleUInt( 0 );
 		}
 	}
 
 	@Override
-	public String getName() {
+	public String getName()
+	{
 		return datFile.getName();
 	}
 
 	@Override
-	public List<String> list() {
-		List<String> result = new ArrayList<String>();
+	public List<String> list()
+	{
+		List<String> result = new ArrayList<>();
 		result.addAll( pathToIndexMap.keySet() );
 		return result;
 	}
 
 	@Override
-	public List<PathAndSize> listSizes() {
-		List<PathAndSize> result = new ArrayList<PathAndSize>();
+	public List<PathAndSize> listSizes()
+	{
+		List<PathAndSize> result = new ArrayList<>();
 		for ( DatEntry entry : entryList ) {
 			if ( entry == null ) continue;
 			PathAndSize pas = new PathAndSize( entry.innerPath, entry.dataSize );
@@ -322,15 +333,16 @@ public class FTLPack extends AbstractPack {
 	}
 
 	@Override
-	public void add( String innerPath, InputStream is ) throws IOException {
+	public void add( String innerPath, InputStream is ) throws IOException
+	{
 		if ( innerPath.contains( "\\" ) ) {
-			throw new IllegalArgumentException( "InnerPath contains backslashes: "+ innerPath );
+			throw new IllegalArgumentException( "InnerPath contains backslashes: " + innerPath );
 		}
 		if ( pathToIndexMap.containsKey( innerPath ) ) {
-			throw new IOException( "InnerPath already exists: "+ innerPath );
+			throw new IOException( "InnerPath already exists: " + innerPath );
 		}
 		if ( !asciiEncoder.reset().canEncode( innerPath ) ) {
-			throw new IllegalArgumentException( "InnerPath contains non-ascii characters: "+ innerPath );
+			throw new IllegalArgumentException( "InnerPath contains non-ascii characters: " + innerPath );
 		}
 
 		// Find a vacancy in the header, or create one.
@@ -355,7 +367,7 @@ public class FTLPack extends AbstractPack {
 
 		byte[] buf = new byte[4096];
 		int len;
-		while ( (len = is.read( buf )) >= 0 ) {
+		while ( ( len = is.read( buf ) ) >= 0 ) {
 			raf.write( buf, 0, len );
 		}
 
@@ -369,12 +381,13 @@ public class FTLPack extends AbstractPack {
 	}
 
 	@Override
-	public void extractTo( String innerPath, OutputStream os ) throws FileNotFoundException, IOException {
+	public void extractTo( String innerPath, OutputStream os ) throws FileNotFoundException, IOException
+	{
 		if ( innerPath.contains( "\\" ) ) {
-			throw new IllegalArgumentException( "InnerPath contains backslashes: "+ innerPath );
+			throw new IllegalArgumentException( "InnerPath contains backslashes: " + innerPath );
 		}
 		if ( !pathToIndexMap.containsKey( innerPath ) ) {
-			throw new FileNotFoundException( "InnerPath does not exist: "+ innerPath );
+			throw new FileNotFoundException( "InnerPath does not exist: " + innerPath );
 		}
 
 		int entryIndex = pathToIndexMap.get( innerPath ).intValue();
@@ -389,7 +402,7 @@ public class FTLPack extends AbstractPack {
 			raf.seek( entry.dataOffset + entry.dataSize - bytesRemaining );
 			len = raf.read( buf, 0, (int)Math.min( buf.length, bytesRemaining ) );
 			if ( len == -1 ) {
-				throw new IOException( "EOF prematurely reached reading innerPath: "+  entry.innerPath );
+				throw new IOException( "EOF prematurely reached reading innerPath: " + entry.innerPath );
 			}
 
 			bytesRemaining -= len;
@@ -398,12 +411,13 @@ public class FTLPack extends AbstractPack {
 	}
 
 	@Override
-	public void remove( String innerPath ) throws FileNotFoundException, IOException {
+	public void remove( String innerPath ) throws FileNotFoundException, IOException
+	{
 		if ( innerPath.contains( "\\" ) ) {
-			throw new IllegalArgumentException( "InnerPath contains backslashes: "+ innerPath );
+			throw new IllegalArgumentException( "InnerPath contains backslashes: " + innerPath );
 		}
 		if ( !pathToIndexMap.containsKey( innerPath ) ) {
-			throw new FileNotFoundException( "InnerPath does not exist: "+ innerPath );
+			throw new FileNotFoundException( "InnerPath does not exist: " + innerPath );
 		}
 
 		int entryIndex = pathToIndexMap.get( innerPath ).intValue();
@@ -420,20 +434,22 @@ public class FTLPack extends AbstractPack {
 	}
 
 	@Override
-	public boolean contains( String innerPath ) {
+	public boolean contains( String innerPath )
+	{
 		if ( innerPath.contains( "\\" ) ) {
-			throw new IllegalArgumentException( "InnerPath contains backslashes: "+ innerPath );
+			throw new IllegalArgumentException( "InnerPath contains backslashes: " + innerPath );
 		}
 		return pathToIndexMap.containsKey( innerPath );
 	}
 
 	@Override
-	public InputStream getInputStream( String innerPath ) throws FileNotFoundException, IOException {
+	public InputStream getInputStream( String innerPath ) throws FileNotFoundException, IOException
+	{
 		if ( innerPath.contains( "\\" ) ) {
-			throw new IllegalArgumentException( "InnerPath contains backslashes: "+ innerPath );
+			throw new IllegalArgumentException( "InnerPath contains backslashes: " + innerPath );
 		}
 		if ( !pathToIndexMap.containsKey( innerPath ) ) {
-			throw new FileNotFoundException( "InnerPath does not exist: "+ innerPath );
+			throw new FileNotFoundException( "InnerPath does not exist: " + innerPath );
 		}
 
 		int entryIndex = pathToIndexMap.get( innerPath ).intValue();
@@ -447,20 +463,22 @@ public class FTLPack extends AbstractPack {
 		// That would keep the file in use: bad.
 		// Closing raf doesn't affect them. :/
 		// This method has best I/O performance though.
-		//MappedByteBuffer buf = raf.getChannel().map( FileChannel.MapMode.READ_ONLY, entry.dataOffset, entry.dataSize );
-		//buf.load();
-		//InputStream stream = new ByteBufferBackedInputStream( buf );
+		// MappedByteBuffer buf = raf.getChannel().map( FileChannel.MapMode.READ_ONLY, entry.dataOffset, entry.dataSize );
+		// buf.load();
+		// InputStream stream = new ByteBufferBackedInputStream( buf );
 
 		return stream;
 	}
 
 	@Override
-	public void close() throws IOException {
+	public void close() throws IOException
+	{
 		raf.close();
 	}
 
-	public List<DatEntry> listMetadata() {
-		return new ArrayList<DatEntry>( entryList );
+	public List<DatEntry> listMetadata()
+	{
+		return new ArrayList<>( entryList );
 	}
 
 	/**
@@ -468,24 +486,27 @@ public class FTLPack extends AbstractPack {
 	 * be created when adding, removing or replacing files.
 	 */
 	@Override
-	public RepackResult repack() throws IOException {
+	public RepackResult repack() throws IOException
+	{
 		long bytesChanged = 0;
 
 		int vacancyCount = Collections.frequency( entryList, null );
 
 		// Build a list of non-null entries, sorted in the order their data appears.
 
-		List<DatEntry> tmpEntries = new ArrayList<DatEntry>( entryList.size() - vacancyCount );
+		List<DatEntry> tmpEntries = new ArrayList<>( entryList.size() - vacancyCount );
 		for ( DatEntry entry : entryList ) {
 			if ( entry != null ) tmpEntries.add( entry );
 		}
 		Collections.sort( tmpEntries, new DatEntryDataOffsetComparator() );
 
-		for ( int i=0; i < tmpEntries.size()-1; i++ ) {
+		for ( int i = 0; i < tmpEntries.size() - 1; i++ ) {
 			DatEntry a = tmpEntries.get( i );
-			DatEntry b = tmpEntries.get( i+1 );
-			if ( a.dataOffset+a.dataSize > b.entryOffset ) {
-				throw new IOException( String.format( "Cannot repack datfile with overlapping entries (\"%s\" and \"%s\")", a.innerPath, b.innerPath ) );
+			DatEntry b = tmpEntries.get( i + 1 );
+			if ( a.dataOffset + a.dataSize > b.entryOffset ) {
+				throw new IOException(
+					String.format( "Cannot repack datfile with overlapping entries (\"%s\" and \"%s\")", a.innerPath, b.innerPath )
+				);
 			}
 		}
 
@@ -500,8 +521,8 @@ public class FTLPack extends AbstractPack {
 
 		long pendingEntryOffset = getHeaderIndexPosition( tmpEntries.size() );
 
-		for ( int i=0; i < tmpEntries.size(); i++ ) {
-			DatEntry entry = tmpEntries.get ( i );
+		for ( int i = 0; i < tmpEntries.size(); i++ ) {
+			DatEntry entry = tmpEntries.get( i );
 			pathToIndexMap.put( entry.innerPath, i );
 
 			// Write the header index.
@@ -511,7 +532,7 @@ public class FTLPack extends AbstractPack {
 
 			// Shift the entry toward the start of the dat.
 			if ( pendingEntryOffset != entry.entryOffset ) {
-				long totalBytes = (entry.dataOffset-entry.entryOffset) + entry.dataSize;
+				long totalBytes = ( entry.dataOffset - entry.entryOffset ) + entry.dataSize;
 				long bytesRemaining = totalBytes;
 				byte[] buf = new byte[4096];
 				int len;
@@ -519,7 +540,7 @@ public class FTLPack extends AbstractPack {
 					raf.seek( entry.entryOffset + totalBytes - bytesRemaining );
 					len = raf.read( buf, 0, (int)Math.min( buf.length, bytesRemaining ) );
 					if ( len == -1 ) {
-						throw new IOException( "EOF prematurely reached reading innerPath: "+ entry.innerPath );
+						throw new IOException( "EOF prematurely reached reading innerPath: " + entry.innerPath );
 					}
 
 					raf.seek( pendingEntryOffset + totalBytes - bytesRemaining );
@@ -527,12 +548,12 @@ public class FTLPack extends AbstractPack {
 					bytesRemaining -= len;
 				}
 
-				entry.dataOffset = pendingEntryOffset + (entry.dataOffset-entry.entryOffset);
+				entry.dataOffset = pendingEntryOffset + ( entry.dataOffset - entry.entryOffset );
 				entry.entryOffset = pendingEntryOffset;
 				bytesChanged += totalBytes;
 			}
 
-			pendingEntryOffset += (entry.dataOffset-entry.entryOffset) + entry.dataSize;
+			pendingEntryOffset += ( entry.dataOffset - entry.entryOffset ) + entry.dataSize;
 		}
 
 		entryList = tmpEntries;
@@ -545,7 +566,6 @@ public class FTLPack extends AbstractPack {
 	}
 
 
-
 	/**
 	 * Information about an innerFile within a dat.
 	 *
@@ -555,32 +575,38 @@ public class FTLPack extends AbstractPack {
 	 * dataOffset  = Offset to the innerFile.
 	 * dataSize    = Size of the innerFile.
 	 */
-	public static class DatEntry {
+	public static class DatEntry
+	{
 		public long entryOffset = 0;
 		public String innerPath = null;
 		public long dataOffset = 0;
 		public long dataSize = 0;
 
-		public DatEntry() {
+
+		public DatEntry()
+		{
 		}
 	}
-
 
 
 	/**
 	 * A Comparator to sort by dataOffset (asc).
 	 */
-	public static class DatEntryDataOffsetComparator implements Comparator<DatEntry> {
+	public static class DatEntryDataOffsetComparator implements Comparator<DatEntry>
+	{
 		@Override
-		public int compare( DatEntry a, DatEntry b ) {
+		public int compare( DatEntry a, DatEntry b )
+		{
 			if ( b == null ) return -1;
 			if ( a == null ) return 1;
 			if ( a.entryOffset < b.entryOffset ) return -1;
 			if ( a.entryOffset > b.entryOffset ) return 1;
 			return 0;
 		}
+
 		@Override
-		public boolean equals( Object o ) {
+		public boolean equals( Object o )
+		{
 			return ( o != null ? o == this : false );
 		}
 	}

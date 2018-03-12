@@ -4,16 +4,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
-
-import net.vhati.ftldat.AbstractPack;
-import net.vhati.ftldat.AbstractPack.PathAndSize;
-import net.vhati.ftldat.PackUtilities;
 
 
 /**
@@ -28,26 +24,29 @@ import net.vhati.ftldat.PackUtilities;
  * method will not include directories themselves,
  * only files within.
  */
-public class FolderPack extends AbstractPack {
-
+public class FolderPack extends AbstractPack
+{
 	private File rootDir;
 
 
-	public FolderPack( File rootDir ) {
+	public FolderPack( File rootDir )
+	{
 		this.rootDir = rootDir;
 	}
 
 
 	@Override
-	public String getName() {
+	public String getName()
+	{
 		return rootDir.getName();
 	}
 
 	@Override
-	public List<String> list() {
-		List<String> result = new ArrayList<String>();
+	public List<String> list()
+	{
+		List<String> result = new ArrayList<>();
 
-		Stack<String> pendingPaths = new Stack<String>();
+		Stack<String> pendingPaths = new Stack<>();
 		pendingPaths.push( "" );
 
 		while ( !pendingPaths.isEmpty() ) {
@@ -58,7 +57,7 @@ public class FolderPack extends AbstractPack {
 			}
 			else if ( tmpFile.isDirectory() ) {
 				for ( String childName : tmpFile.list() ) {
-					pendingPaths.push( PackUtilities.ftlPathJoin(current, childName) );
+					pendingPaths.push( PackUtilities.ftlPathJoin( current, childName ) );
 				}
 			}
 		}
@@ -66,8 +65,9 @@ public class FolderPack extends AbstractPack {
 	}
 
 	@Override
-	public List<PathAndSize> listSizes() {
-		List<PathAndSize> result = new ArrayList<PathAndSize>();
+	public List<PathAndSize> listSizes()
+	{
+		List<PathAndSize> result = new ArrayList<>();
 		List<String> innerPaths = list();
 		for ( String innerPath : innerPaths ) {
 			File tmpFile = getFile( innerPath );
@@ -77,9 +77,10 @@ public class FolderPack extends AbstractPack {
 	}
 
 	@Override
-	public void add( String innerPath, InputStream is ) throws IOException {
+	public void add( String innerPath, InputStream is ) throws IOException
+	{
 		File dstFile = getFile( innerPath );
-		if ( dstFile.exists() ) throw new IOException( "InnerPath already exists: "+ innerPath );
+		if ( dstFile.exists() ) throw new IOException( "InnerPath already exists: " + innerPath );
 
 		dstFile.getParentFile().mkdirs();
 
@@ -89,18 +90,22 @@ public class FolderPack extends AbstractPack {
 
 			byte[] buf = new byte[4096];
 			int len;
-			while ( (len = is.read( buf )) >= 0 ) {
+			while ( ( len = is.read( buf ) ) >= 0 ) {
 				os.write( buf, 0, len );
 			}
 		}
 		finally {
-			try {if ( os != null ) os.close();}
-			catch ( IOException e ) {}
+			try {
+				if ( os != null ) os.close();
+			}
+			catch ( IOException e ) {
+			}
 		}
 	}
 
 	@Override
-	public void extractTo( String innerPath, OutputStream os ) throws IOException {
+	public void extractTo( String innerPath, OutputStream os ) throws IOException
+	{
 		File srcFile = getFile( innerPath );
 
 		FileInputStream is = null;
@@ -109,18 +114,22 @@ public class FolderPack extends AbstractPack {
 
 			byte[] buf = new byte[4096];
 			int len;
-			while ( (len = is.read( buf )) >= 0 ) {
+			while ( ( len = is.read( buf ) ) >= 0 ) {
 				os.write( buf, 0, len );
 			}
 		}
 		finally {
-			try {if ( is != null ) is.close();}
-			catch ( IOException e ) {}
+			try {
+				if ( is != null ) is.close();
+			}
+			catch ( IOException e ) {
+			}
 		}
 	}
 
 	@Override
-	public void remove( String innerPath ) {
+	public void remove( String innerPath )
+	{
 		File tmpFile = getFile( innerPath );
 		if ( tmpFile.exists() && tmpFile.isFile() ) {
 			tmpFile.delete();
@@ -128,13 +137,15 @@ public class FolderPack extends AbstractPack {
 	}
 
 	@Override
-	public boolean contains( String innerPath ) {
+	public boolean contains( String innerPath )
+	{
 		File tmpFile = getFile( innerPath );
 		return tmpFile.exists();
 	}
 
 	@Override
-	public InputStream getInputStream( String innerPath ) throws FileNotFoundException, IOException  {
+	public InputStream getInputStream( String innerPath ) throws FileNotFoundException, IOException
+	{
 		return new FileInputStream( getFile( innerPath ) );
 	}
 
@@ -142,15 +153,16 @@ public class FolderPack extends AbstractPack {
 	 * Returns a File object for an innerPath.
 	 * The location it represents is not guaranteed to exist.
 	 */
-	public File getFile( String innerPath ) {
+	public File getFile( String innerPath )
+	{
 		if ( innerPath.contains( "\\" ) ) {
-			throw new IllegalArgumentException( "InnerPath contains backslashes: "+ innerPath );
+			throw new IllegalArgumentException( "InnerPath contains backslashes: " + innerPath );
 		}
 		File tmpFile = new File( rootDir, innerPath );
 
 		// Check if the file is inside rootDir.
 		File parentDir = tmpFile.getParentFile();
-		while( parentDir != null ) {
+		while ( parentDir != null ) {
 			if ( parentDir.equals( rootDir ) ) return tmpFile;
 			parentDir = parentDir.getParentFile();
 		}

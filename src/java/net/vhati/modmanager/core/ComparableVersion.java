@@ -20,8 +20,8 @@ import java.util.regex.Pattern;
  *
  * For details, see the string constructor and compareTo().
  */
-public class ComparableVersion implements Comparable<ComparableVersion> {
-
+public class ComparableVersion implements Comparable<ComparableVersion>
+{
 	private Pattern numbersPtn = Pattern.compile( "^((?:\\d+[.])*\\d+)" );
 	private Pattern suffixPtn = Pattern.compile( "([-_]|(?:[-_]?(?:[ab]|r|rc)))(\\d+)|([A-Za-z](?= |$))" );
 	private Pattern commentPtn = Pattern.compile( "(.+)$" );
@@ -34,7 +34,8 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
 	private int suffixNum;
 
 
-	public ComparableVersion( int[] numbers, String suffix, String comment ) {
+	public ComparableVersion( int[] numbers, String suffix, String comment )
+	{
 		this.numbers = numbers;
 		setSuffix( suffix );
 		setComment( comment );
@@ -63,9 +64,11 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
 	 *   1.2.3D
 	 *   Alpha
 	 *
-	 * @throws IllegalArgumentException if the string is unsuitable
+	 * @throws IllegalArgumentException
+	 *             if the string is unsuitable
 	 */
-	public ComparableVersion( String s ) {
+	public ComparableVersion( String s )
+	{
 		boolean noNumbers = true;
 		boolean noComment = true;
 
@@ -93,9 +96,9 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
 			// If a space occurs after (numbers +suffix?), skip it.
 			// Thus the comment matcher will start on the first comment char.
 			//
-			if ( commentMatcher.regionStart()+1 < s.length() ) {
+			if ( commentMatcher.regionStart() + 1 < s.length() ) {
 				if ( s.charAt( commentMatcher.regionStart() ) == ' ' ) {
-					commentMatcher.region( commentMatcher.regionStart()+1, s.length() );
+					commentMatcher.region( commentMatcher.regionStart() + 1, s.length() );
 				}
 			}
 		}
@@ -111,12 +114,13 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
 		}
 
 		if ( noNumbers && noComment ) {
-			throw new IllegalArgumentException( "Could not parse version string: "+ s );
+			throw new IllegalArgumentException( "Could not parse version string: " + s );
 		}
 	}
 
 
-	private void setNumbers( String s ) {
+	private void setNumbers( String s )
+	{
 		if ( s == null || s.length() == 0 ) {
 			numbers = new int[0];
 			return;
@@ -125,19 +129,20 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
 		Matcher m = numbersPtn.matcher( s );
 		if ( m.matches() ) {
 			String numString = m.group( 1 );
-			String[] numChunks = numString.split("[.]");
+			String[] numChunks = numString.split( "[.]" );
 
-			numbers = new int[ numChunks.length ];
-			for ( int i=0; i < numChunks.length; i++ ) {
+			numbers = new int[numChunks.length];
+			for ( int i = 0; i < numChunks.length; i++ ) {
 				numbers[i] = Integer.parseInt( numChunks[i] );
 			}
 		}
 		else {
-			throw new IllegalArgumentException( "Could not parse version numbers string: "+ s );
+			throw new IllegalArgumentException( "Could not parse version numbers string: " + s );
 		}
 	}
 
-	private void setSuffix( String s ) {
+	private void setSuffix( String s )
+	{
 		if ( s == null || s.length() == 0 ) {
 			suffix = null;
 			suffixNum = -1;
@@ -154,18 +159,20 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
 
 			if ( m.group( 2 ) != null ) {
 				suffixNum = Integer.parseInt( m.group( 2 ) );
-			} else {
+			}
+			else {
 				suffixNum = -1;
 			}
 
 			suffix = m.group( 0 );
 		}
 		else {
-			throw new IllegalArgumentException( "Could not parse version suffix string: "+ s );
+			throw new IllegalArgumentException( "Could not parse version suffix string: " + s );
 		}
 	}
 
-	private void setComment( String s ) {
+	private void setComment( String s )
+	{
 		if ( s == null || s.length() == 0 ) {
 			comment = null;
 			return;
@@ -176,7 +183,7 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
 			comment = m.group( 1 );
 		}
 		else {
-			throw new IllegalArgumentException( "Could not parse version comment string: "+ s );
+			throw new IllegalArgumentException( "Could not parse version comment string: " + s );
 		}
 	}
 
@@ -184,41 +191,47 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
 	/**
 	 * Returns the array of major/minor/etc version numbers.
 	 */
-	public int[] getNumbers() {
+	public int[] getNumbers()
+	{
 		return numbers;
 	}
 
 	/**
 	 * Returns the pre-number portion of the suffix, or null if there was no number.
 	 */
-	public String getSuffixDivider() {
+	public String getSuffixDivider()
+	{
 		return suffixDivider;
 	}
 
 	/**
 	 * Returns the number in the suffix, or -1 if there was no number.
 	 */
-	public int getSuffixNumber() {
+	public int getSuffixNumber()
+	{
 		return suffixNum;
 	}
 
 	/**
 	 * Returns the entire suffix, or null.
 	 */
-	public String getSuffix() {
+	public String getSuffix()
+	{
 		return suffix;
 	}
 
 	/**
 	 * Returns the human-readable comment, or null.
 	 */
-	public String getComment() {
+	public String getComment()
+	{
 		return comment;
 	}
 
 
 	@Override
-	public String toString() {
+	public String toString()
+	{
 		StringBuilder buf = new StringBuilder();
 		for ( int number : numbers ) {
 			if ( buf.length() > 0 ) buf.append( "." );
@@ -248,12 +261,13 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
 	 * - Then the comment is compared alphabetically.
 	 */
 	@Override
-	public int compareTo( ComparableVersion other ) {
+	public int compareTo( ComparableVersion other )
+	{
 		if ( other == null ) return -1;
 		if ( other == this ) return 0;
 
 		int[] oNumbers = other.getNumbers();
-		for ( int i=0; i < numbers.length && i < oNumbers.length; i++ ) {
+		for ( int i = 0; i < numbers.length && i < oNumbers.length; i++ ) {
 			if ( numbers[i] < oNumbers[i] ) return -1;
 			if ( numbers[i] > oNumbers[i] ) return 1;
 		}
@@ -285,14 +299,15 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
 	}
 
 	@Override
-	public boolean equals( Object o ) {
+	public boolean equals( Object o )
+	{
 		if ( o == null ) return false;
 		if ( o == this ) return true;
 		if ( o instanceof ComparableVersion == false ) return false;
 		ComparableVersion other = (ComparableVersion)o;
 
 		int[] oNumbers = other.getNumbers();
-		for ( int i=0; i < numbers.length && i < oNumbers.length; i++ ) {
+		for ( int i = 0; i < numbers.length && i < oNumbers.length; i++ ) {
 			if ( numbers[i] != oNumbers[i] ) return false;
 		}
 		if ( numbers.length != oNumbers.length ) return false;
@@ -309,12 +324,13 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
 	}
 
 	@Override
-	public int hashCode() {
+	public int hashCode()
+	{
 		int result = 79;
 		int salt = 35;
 		int nullCode = 13;
 
-		List<Integer> tmpNumbers = new ArrayList<Integer>( getNumbers().length );
+		List<Integer> tmpNumbers = new ArrayList<>( getNumbers().length );
 		for ( int n : getNumbers() )
 			tmpNumbers.add( new Integer( n ) );
 		result = salt * result + tmpNumbers.hashCode();

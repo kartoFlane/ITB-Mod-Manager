@@ -7,8 +7,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.vhati.ftldat.AbstractPack;
-
 
 /**
  * A container coordinating access to one or more of FTL's dat files.
@@ -32,8 +30,8 @@ import net.vhati.ftldat.AbstractPack;
  * @see net.vhati.ftldat.FTLPack
  * @see net.vhati.ftldat.PkgPack
  */
-public class PackContainer {
-
+public class PackContainer
+{
 	/**
 	 * Regex for innerPaths.
 	 *
@@ -43,11 +41,12 @@ public class PackContainer {
 	 */
 	protected Pattern pathPtn = Pattern.compile( "^(?:(([^/]+/)(?:.*/)?))?([^/]+)$" );
 
-	protected Map<String, AbstractPack> rootMap = new HashMap<String, AbstractPack>();
+	protected Map<String, AbstractPack> rootMap = new HashMap<>();
 	protected AbstractPack defaultPack = null;
 
 
-	public PackContainer() {
+	public PackContainer()
+	{
 	}
 
 	/**
@@ -55,11 +54,13 @@ public class PackContainer {
 	 *
 	 * If null, only specific root dir paths will be supported.
 	 */
-	public void setDefaultPack( AbstractPack pack ) {
+	public void setDefaultPack( AbstractPack pack )
+	{
 		defaultPack = pack;
 	}
 
-	public AbstractPack getDefaultPack() {
+	public AbstractPack getDefaultPack()
+	{
 		return defaultPack;
 	}
 
@@ -72,9 +73,10 @@ public class PackContainer {
 	 * A null pack should be interpreted as the result when paths should be
 	 * ignored. A null root would apply to top-level files.
 	 */
-	public void setPackFor( String root, AbstractPack pack ) throws IllegalArgumentException {
+	public void setPackFor( String root, AbstractPack pack ) throws IllegalArgumentException
+	{
 		if ( root != null && !root.endsWith( "/" ) ) {
-			throw new IllegalArgumentException( "Root dir lacks a trailing forward slash:"+ root );
+			throw new IllegalArgumentException( "Root dir lacks a trailing forward slash:" + root );
 		}
 
 		rootMap.put( root, pack );
@@ -85,7 +87,8 @@ public class PackContainer {
 	 *
 	 * Returns null if no pack is relevant or if innerPath is malformed.
 	 */
-	public AbstractPack getPackFor( String innerPath ) {
+	public AbstractPack getPackFor( String innerPath )
+	{
 		Matcher m = pathPtn.matcher( innerPath );
 		if ( m.matches() ) {
 			String root = m.group( 2 );
@@ -108,15 +111,17 @@ public class PackContainer {
 	 *
 	 * The list may contain null, if that root was set.
 	 */
-	public List<String> getRoots() {
-		return new ArrayList<String>( rootMap.keySet() );
+	public List<String> getRoots()
+	{
+		return new ArrayList<>( rootMap.keySet() );
 	}
 
 	/**
 	 * Returns a list of all contained packs.
 	 */
-	public List<AbstractPack> getPacks() {
-		List<AbstractPack> result = new ArrayList<AbstractPack>( rootMap.values().size() + 1 );
+	public List<AbstractPack> getPacks()
+	{
+		List<AbstractPack> result = new ArrayList<>( rootMap.values().size() + 1 );
 
 		for ( AbstractPack pack : rootMap.values() ) {
 			if ( pack != null && !result.contains( pack ) ) result.add( pack );

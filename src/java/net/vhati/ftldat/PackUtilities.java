@@ -9,12 +9,13 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 
-public class PackUtilities {
-
+public class PackUtilities
+{
 	/**
 	 * Returns segments of a path string, split by each "/" occurrence.
 	 */
-	public static String[] ftlPathSplit( String path ) {
+	public static String[] ftlPathSplit( String path )
+	{
 		return path.split( "/" );
 	}
 
@@ -24,7 +25,8 @@ public class PackUtilities {
 	 * No slashes will be added for empty strings.
 	 * Any incidental backslashes will become forward slashes.
 	 */
-	public static String ftlPathJoin( String[] chunks ) {
+	public static String ftlPathJoin( String[] chunks )
+	{
 		StringBuilder buf = new StringBuilder();
 		boolean first = true;
 		for ( String chunk : chunks ) {
@@ -44,7 +46,8 @@ public class PackUtilities {
 	 * No slash will be added if either string is empty.
 	 * Any incidental backslashes will become forward slashes.
 	 */
-	public static String ftlPathJoin( String a, String b ) {
+	public static String ftlPathJoin( String a, String b )
+	{
 		StringBuilder buf = new StringBuilder();
 		if ( a.length() > 0 ) buf.append( a );
 		if ( a.length() * b.length() > 0 ) buf.append( "/" );
@@ -63,7 +66,7 @@ public class PackUtilities {
 		) {
 			byte[] buf = new byte[4096];
 			int len;
-			while ( (len = is.read( buf )) >= 0 ) {
+			while ( ( len = is.read( buf ) ) >= 0 ) {
 				os.write( buf, 0, len );
 			}
 		}
@@ -106,23 +109,25 @@ public class PackUtilities {
 	 *
 	 * The returned string will be lowercase hexadecimal.
 	 */
-	public static String calcStreamMD5( InputStream is ) throws NoSuchAlgorithmException, IOException {
+	public static String calcStreamMD5( InputStream is ) throws NoSuchAlgorithmException, IOException
+	{
 		MessageDigest md = MessageDigest.getInstance( "MD5" );
 		byte[] buf = new byte[4096];
 		int len;
-		while ( (len = is.read( buf )) >= 0 ) {
+		while ( ( len = is.read( buf ) ) >= 0 ) {
 			md.update( buf, 0, len );
 		}
 
 		byte[] hashBytes = md.digest();
 		StringBuilder hashStringBuf = new StringBuilder();
 		for ( byte b : hashBytes ) {
-			hashStringBuf.append( Integer.toString( (b & 0xff) + 0x100, 16 ).substring( 1 ) );
+			hashStringBuf.append( Integer.toString( ( b & 0xff ) + 0x100, 16 ).substring( 1 ) );
 		}
 		return hashStringBuf.toString();
 	}
 
-	public static String calcFileMD5( File f ) throws NoSuchAlgorithmException, IOException {
+	public static String calcFileMD5( File f ) throws NoSuchAlgorithmException, IOException
+	{
 		String result = null;
 		try ( FileInputStream is = new FileInputStream( f ) ) {
 			result = PackUtilities.calcStreamMD5( is );
@@ -134,11 +139,12 @@ public class PackUtilities {
 	/**
 	 * Returns an approximate byte count for humans.
 	 */
-	public static String humanReadableByteCount( long bytes, boolean si ) {
+	public static String humanReadableByteCount( long bytes, boolean si )
+	{
 		int unit = si ? 1000 : 1024;
-		if ( bytes < unit ) return bytes +" B";
+		if ( bytes < unit ) return bytes + " B";
 		int exp = (int)( Math.log( bytes ) / Math.log( unit ) );
-		String pre = (si ? "kMGTPE" : "KMGTPE").charAt( exp-1 ) + (si ? "" : "i");
-		return String.format( "%.1f %sB", (bytes / Math.pow( unit, exp )), pre );
+		String pre = ( si ? "kMGTPE" : "KMGTPE" ).charAt( exp - 1 ) + ( si ? "" : "i" );
+		return String.format( "%.1f %sB", ( bytes / Math.pow( unit, exp ) ), pre );
 	}
 }

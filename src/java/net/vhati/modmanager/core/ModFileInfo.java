@@ -3,27 +3,38 @@ package net.vhati.modmanager.core;
 import java.io.File;
 
 
-public class ModFileInfo implements Comparable<ModFileInfo> {
+public class ModFileInfo implements Comparable<ModFileInfo>
+{
 	private File file;
 	private String name;
 
 
-	public ModFileInfo( File f ) {
+	public ModFileInfo( File f )
+	{
 		this.file = f;
 		this.name = f.getName().replaceAll( "[.][^.]+$", "" );
 	}
 
-	public File getFile() { return this.file; }
-	public String getName() { return this.name; }
+	public File getFile()
+	{
+		return this.file;
+	}
+
+	public String getName()
+	{
+		return this.name;
+	}
 
 
 	@Override
-	public String toString() {
+	public String toString()
+	{
 		return getName();
 	}
 
 	@Override
-	public int compareTo( ModFileInfo other ) {
+	public int compareTo( ModFileInfo other )
+	{
 		if ( other == null ) return -1;
 		if ( other == this ) return 0;
 
@@ -31,7 +42,8 @@ public class ModFileInfo implements Comparable<ModFileInfo> {
 	}
 
 	@Override
-	public boolean equals( Object o ) {
+	public boolean equals( Object o )
+	{
 		if ( o == null ) return false;
 		if ( o == this ) return true;
 		if ( o instanceof ModFileInfo == false ) return false;
@@ -43,7 +55,8 @@ public class ModFileInfo implements Comparable<ModFileInfo> {
 	}
 
 	@Override
-	public int hashCode() {
+	public int hashCode()
+	{
 		int result = 89;
 		int salt = 36;
 
