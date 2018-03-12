@@ -1,0 +1,30 @@
+target/
+
+*.class
+*.tmp
+*.bak
+~$*
+
+
+# Windows image file caches
+Thumbs.db
+
+# Windows folder config file
+Desktop.ini
+
+
+# Mac junk
+.DS_Store
+
+
+# IdeaJ
+*.idea
+*.iml
+
+
+# Eclipse
+.settings/
+bin/
+.classpath
+.project
+build.fxbuild
