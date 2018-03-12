@@ -20,7 +20,7 @@ public class AppVersionChecker
 {
 	private static final Logger log = LogManager.getLogger();
 
-	public static final String APP_UPDATE_URL = "https://raw.github.com/kartoFlane/ITB-Mod-Manager/master/skel_common/backup/auto_update.json";
+	public static final String APP_UPDATE_URL = "https://raw.github.com/kartoFlane/ITB-Mod-Manager/master/skels/skel_common/backup/auto_update.lua";
 
 	private final EventSingle<AutoUpdateInfo> updateAvailable = Event.create( null );
 
