@@ -1,0 +1,28 @@
+/* modena.css: https://gist.github.com/maxd/63691840fc372f22f470 */
+
+* {
+	/* Drag-and-drop dropping indicator */
+	-dnd-indicator-insert-color: -fx-accent;
+	/* Drag-and-drop dropping indicator when the item being hovered over is selected */
+	-dnd-indicator-selected-insert-color: black;
+}
+
+.tree-cell {
+	-fx-border-insets: 0.0;
+	-fx-border-color: transparent;
+	-fx-border-width: 2.0 2.0 2.0 2.0;
+}
+
+#mntmUpdate {
+	/* 
+	 * Could make it more prominent, but apparently it's not possible 
+	 * to derive a color with a different value for alpha channel, can
+	 * only change saturation.
+	 */
+	-fx-background-color: -fx-faint-focus-color;
+}
+
+#mntmUpdate:hover {
+	-fx-background-color: -fx-accent;
+}
+

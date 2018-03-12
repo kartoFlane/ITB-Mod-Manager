@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<MenuBar xmlns:fx="http://javafx.com/fxml" fx:id="menuBar">
+	<menus>
+		<Menu text="_File" mnemonicParsing="true">
+			<items>
+				<MenuItem fx:id="mntmRescan" text="Rescan _mods/" onAction="#onRescanClicked" />
+				<SeparatorMenuItem />
+				<MenuItem fx:id="mntmExtract" text="_Extract .dat"
+					onAction="#onExtractClicked" />
+				<MenuItem fx:id="mntmRepack" text="_Repack .dat" onAction="#onRepackClicked" />
+				<SeparatorMenuItem />
+				<MenuItem fx:id="mntmPreferences" text="_Preferences"
+					onAction="#onPreferencesClicked" />
+				<SeparatorMenuItem />
+				<MenuItem fx:id="mntmExit" text="E_xit" onAction="#onExitClicked" />
+			</items>
+		</Menu>
+		<Menu text="_Help" mnemonicParsing="true">
+			<items>
+				<MenuItem fx:id="mntmDeleteBackups" text="_Delete Backups"
+					onAction="#onDeleteBackupsClicked" />
+				<MenuItem fx:id="mntmVerifyIntegrity" text="Steam: _Verify integrity of game files"
+					onAction="#onVerifyIntegrityClicked" />
+				<SeparatorMenuItem />
+				<MenuItem fx:id="mntmAbout" text="_About" onAction="#onAboutClicked" />
+			</items>
+		</Menu>
+	</menus>
+</MenuBar>

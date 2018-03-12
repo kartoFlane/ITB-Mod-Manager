@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TreeItem?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="top_center" styleClass="root" xmlns:fx="http://javafx.com/fxml">
+	<!-- MenuBar inserted here -->
+	<SplitPane fx:id="splitPane" dividerPositions="0.5"
+		VBox.vgrow="ALWAYS">
+		<items>
+			<VBox fx:id="contentPaneLeft" alignment="top_center" spacing="10"
+				minWidth="100">
+				<padding>
+					<Insets bottom="10" left="10" right="10" top="10" />
+				</padding>
+				<!-- TreeView inserted here -->
+				<Button fx:id="btnPatch" prefWidth="100" onAction="#onPatchClicked"
+					text="Patch" />
+			</VBox>
+			<VBox fx:id="contentPaneRight" alignment="top_left" spacing="10"
+				minWidth="100">
+				<padding>
+					<Insets bottom="10" left="10" right="10" top="10" />
+				</padding>
+			</VBox>
+		</items>
+	</SplitPane>
+</VBox>
