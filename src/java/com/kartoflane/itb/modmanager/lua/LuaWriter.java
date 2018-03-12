@@ -7,6 +7,17 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 
+/**
+ * A writer that can output simple Lua objects.
+ * Outputs:
+ * - null values as nil
+ * - integers, chars, longs, floats and doubles
+ * - boolean values
+ * - strings in double quotes
+ * - maps as tables with named values (only with string keys; strings
+ * are checked whether they're valid Lua identifiers)
+ * - lists and arrays as tables with unnamed values
+ */
 public class LuaWriter
 {
 	private static final String identifierPtn = "([a-zA-Z_][a-zA-Z0-9_]*)";
@@ -86,9 +97,10 @@ public class LuaWriter
 				appendObject( buf, entry.getValue(), indent ).append( ",\n" );
 			}
 			--indent;
+
+			appendIndent( buf, indent );
 		}
 
-		appendIndent( buf, indent );
 		buf.append( '}' );
 
 		return buf;
@@ -106,9 +118,10 @@ public class LuaWriter
 				appendObject( buf, entry, indent ).append( ",\n" );
 			}
 			--indent;
+
+			appendIndent( buf, indent );
 		}
 
-		appendIndent( buf, indent );
 		buf.append( '}' );
 
 		return buf;
