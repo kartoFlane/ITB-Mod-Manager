@@ -16,7 +16,7 @@
 		VBox.vgrow="ALWAYS">
 		<items>
 			<VBox fx:id="contentPaneLeft" alignment="top_center" spacing="10"
-				minWidth="100">
+				minWidth="180">
 				<padding>
 					<Insets bottom="10" left="10" right="10" top="10" />
 				</padding>

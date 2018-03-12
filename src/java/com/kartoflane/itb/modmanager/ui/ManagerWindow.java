@@ -140,7 +140,10 @@ public class ManagerWindow
 		stage.setTitle( ITBModManager.APP_NAME );
 		stage.setScene( scene );
 		stage.setMinHeight( 250 );
-		stage.setMinWidth( 250 );
+		stage.setMinWidth(
+			contentPaneLeft.getMinWidth() + contentPaneLeft.getPadding().getRight()
+				+ scrollPaneRight.getMinWidth() + contentPaneRight.getPadding().getLeft()
+		);
 		stage.setOnCloseRequest( this::onCloseRequest );
 
 		scrollPaneRight.maxWidthProperty().bindBidirectional( scrollPaneRight.prefWidthProperty() );
