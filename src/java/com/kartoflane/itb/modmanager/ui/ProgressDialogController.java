@@ -186,7 +186,7 @@ public class ProgressDialogController
 	}
 
 	@FXML
-	protected void onContinueRequest()
+	protected void onContinueClicked()
 	{
 		stage.close();
 
