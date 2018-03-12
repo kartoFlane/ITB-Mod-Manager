@@ -7,7 +7,7 @@ import java.io.OutputStream;
 import java.util.List;
 
 
-public abstract class AbstractPack {
+public abstract class AbstractPack implements AutoCloseable {
 
 	/**
 	 * Returns a descriptive name for this dat.

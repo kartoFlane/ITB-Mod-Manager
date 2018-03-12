@@ -2,11 +2,9 @@ package net.vhati.ftldat;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -57,25 +55,49 @@ public class PackUtilities {
 	/**
 	 * Copies all bytes from one file to another.
 	 */
-	public static void copyFile( File srcFile, File dstFile ) throws IOException {
-		FileInputStream is = null;
-		FileOutputStream os = null;
-		try {
-			is = new FileInputStream( srcFile );
-			os = new FileOutputStream( dstFile );
-
+	public static void copyFile( File srcFile, File dstFile ) throws IOException
+	{
+		try (
+			FileInputStream is = new FileInputStream( srcFile );
+			FileOutputStream os = new FileOutputStream( dstFile )
+		) {
 			byte[] buf = new byte[4096];
 			int len;
 			while ( (len = is.read( buf )) >= 0 ) {
 				os.write( buf, 0, len );
 			}
 		}
-		finally {
-			try {if ( is != null ) is.close();}
-			catch ( IOException e ) {}
+	}
 
-			try {if ( os != null ) os.close();}
-			catch ( IOException e ) {}
+	public static void backUpDirAsPack( File srcFile, File dstFile ) throws IOException
+	{
+		try (
+			AbstractPack srcPack = new FolderPack( srcFile );
+			AbstractPack dstPack = new FTLPack( dstFile, "w+" )
+		) {
+
+			for ( String innerPath : srcPack.list() ) {
+				dstPack.add( innerPath, srcPack.getInputStream( innerPath ) );
+			}
+
+			dstPack.repack();
+		}
+	}
+
+	public static void restorePackAsDir( File srcFile, File dstFile ) throws IOException
+	{
+		try (
+			AbstractPack srcPack = new FTLPack( srcFile, "r" );
+			AbstractPack dstPack = new FolderPack( dstFile )
+		) {
+
+			for ( String innerPath : srcPack.list() ) {
+				if ( dstPack.contains( innerPath ) )
+					dstPack.remove( innerPath );
+				dstPack.add( innerPath, srcPack.getInputStream( innerPath ) );
+			}
+
+			dstPack.repack(); // No-op for FolderPack, but let's call it anyway *shrug*
 		}
 	}
 
@@ -102,14 +124,8 @@ public class PackUtilities {
 
 	public static String calcFileMD5( File f ) throws NoSuchAlgorithmException, IOException {
 		String result = null;
-		FileInputStream is = null;
-		try {
-			is = new FileInputStream( f );
+		try ( FileInputStream is = new FileInputStream( f ) ) {
 			result = PackUtilities.calcStreamMD5( is );
-		}
-		finally {
-			try {if (is != null) is.close();}
-			catch ( Exception e ) {}
 		}
 		return result;
 	}

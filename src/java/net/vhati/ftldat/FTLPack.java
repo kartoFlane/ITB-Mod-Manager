@@ -392,6 +392,7 @@ public class FTLPack extends AbstractPack {
 				throw new IOException( "EOF prematurely reached reading innerPath: "+  entry.innerPath );
 			}
 
+			bytesRemaining -= len;
 			os.write( buf, 0, len );
 		}
 	}

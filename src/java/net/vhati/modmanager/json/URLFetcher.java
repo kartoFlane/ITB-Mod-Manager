@@ -5,17 +5,13 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -24,11 +20,12 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 public class URLFetcher {
-
-	private static final Logger log = LoggerFactory.getLogger( URLFetcher.class );
+	private static final Logger log = LogManager.getLogger();
 
 
 	/**
@@ -50,11 +47,10 @@ public class URLFetcher {
 		log.debug( String.format( "Attempting to download the latest \"%s\"", localFile.getName() ) );
 		if ( eTagFile.exists() ) {
 			// Load the old eTag.
-			InputStream etagIn = null;
-			BufferedReader etagReader = null;
-			try {
-				etagIn = new FileInputStream( eTagFile );
-				etagReader = new BufferedReader( new InputStreamReader( etagIn, "UTF-8" ) );
+			try (
+				InputStream etagIn = new FileInputStream( eTagFile );
+				BufferedReader etagReader = new BufferedReader( new InputStreamReader( etagIn, StandardCharsets.UTF_8 ) )
+			) {
 				String line = etagReader.readLine();
 				if ( line.length() > 0 ) {
 					localETag = line;
@@ -63,13 +59,6 @@ public class URLFetcher {
 			catch ( IOException e ) {
 				// Not serious enough to be a real error.
 				log.debug( String.format( "Error reading eTag from \"%s\"", eTagFile.getName() ), e );
-			}
-			finally {
-				try {if ( etagReader != null ) etagReader.close();}
-				catch ( IOException e ) {}
-
-				try {if ( etagIn != null ) etagIn.close();}
-				catch ( IOException e ) {}
 			}
 		}
 
@@ -140,23 +129,15 @@ public class URLFetcher {
 
 		if ( remoteETag != null ) {
 			// Save the new eTag.
-			OutputStream etagOut = null;
-			BufferedWriter etagWriter = null;
-			try {
-				etagOut = new FileOutputStream( eTagFile );
-				etagWriter = new BufferedWriter( new OutputStreamWriter( etagOut, "UTF-8" ) );
+			try (
+				OutputStream etagOut = new FileOutputStream( eTagFile );
+				BufferedWriter etagWriter = new BufferedWriter( new OutputStreamWriter( etagOut, StandardCharsets.UTF_8 ) )
+			) {
 				etagWriter.append( remoteETag );
 				etagWriter.flush();
 			}
 			catch ( IOException e ) {
 				log.error( String.format( "Error writing eTag to \"%s\"", eTagFile.getName() ), e );
-			}
-			finally {
-				try {if ( etagWriter != null ) etagWriter.close();}
-				catch ( IOException e ) {}
-
-				try {if ( etagOut != null ) etagOut.close();}
-				catch ( IOException e ) {}
 			}
 		}
 
