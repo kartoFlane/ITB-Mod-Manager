@@ -88,14 +88,6 @@ public class ModsScanner
 		return modsTableStateAmended;
 	}
 
-	/**
-	 * Sets the ModDB for local metadata. (thread-safe)
-	 */
-	public void setLocalModDB( final ModDB newDB )
-	{
-		UIUtilities.runNowOrLater( () -> localModDB = newDB );
-	}
-
 	public Region buildModInfoPane( ModFileInfo modFileInfo, ObservableValue<? extends Number> widthProperty )
 	{
 		String modHash = modFileHashes.get( modFileInfo.getFile() );
@@ -308,6 +300,14 @@ public class ModsScanner
 		catch ( IOException e ) {
 			log.error( String.format( "Error writing metadata from local mods to \"%s\"", modsMetadataFile.getName() ), e );
 		}
+	}
+
+	/**
+	 * Sets the ModDB for local metadata. (thread-safe)
+	 */
+	private void setLocalModDB( final ModDB newDB )
+	{
+		UIUtilities.runNowOrLater( () -> localModDB = newDB );
 	}
 
 	private void amendModsTableState( ListState<ModFileInfo> tableState, List<ModFileInfo> unsortedMods )
