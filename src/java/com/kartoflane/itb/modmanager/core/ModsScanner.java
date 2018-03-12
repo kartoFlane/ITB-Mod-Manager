@@ -33,7 +33,6 @@ import com.kartoflane.itb.modmanager.util.UIUtilities;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Hyperlink;
-import javafx.scene.control.Label;
 import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
 import net.vhati.ftldat.PackUtilities;
@@ -88,6 +87,16 @@ public class ModsScanner
 		return modsTableStateAmended;
 	}
 
+	/**
+	 * Constructs and returns a info panel for the specified mod, to be inserted in
+	 * {@link ManagerFWindow}'s rightContentPane.
+	 * 
+	 * @param modFileInfo
+	 *            the mod file to construct info pane for
+	 * @param widthProperty
+	 *            width property of the container the pane will be inserted into, allowing
+	 *            the pane to layout its children accordingly.
+	 */
 	public Region buildModInfoPane( ModFileInfo modFileInfo, ObservableValue<? extends Number> widthProperty )
 	{
 		String modHash = modFileHashes.get( modFileInfo.getFile() );
@@ -98,7 +107,7 @@ public class ModsScanner
 			// modInfo = catalogModDB.getModInfo( modHash );
 		}
 
-		if ( modInfo != null ) {
+		if ( modInfo != null && !modInfo.isBlank() ) {
 			Text title = new Text( modInfo.getTitle() );
 			title.setStyle( "-fx-font-weight: bold;" + "-fx-font-size: 20;" );
 			Text authorVersion = new Text(
@@ -119,7 +128,7 @@ public class ModsScanner
 					+ "But the mod manager has not yet finished scanning the mods/ folder. "
 					+ "Try clicking on this mod again after waiting a few seconds.";
 
-				return new Label( body );
+				return UIUtilities.decoratedText( body, widthProperty );
 			}
 			else {
 				Date modDate = modFileDates.get( modHash );
@@ -150,11 +159,17 @@ public class ModsScanner
 
 				bodyBuf.append( "Mods can include an embedded description, but this one did not.\n" );
 
-				return new Label( bodyBuf.toString() );
+				return UIUtilities.decoratedText( bodyBuf.toString(), widthProperty );
 			}
 		}
 	}
 
+	/**
+	 * Returns ModInfo for the specified file.
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if no ModInfo could be found for the specified file
+	 */
 	public ModInfo getModInfo( File modFile )
 	{
 		String hash = modFileHashes.get( modFile );
