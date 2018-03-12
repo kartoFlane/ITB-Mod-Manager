@@ -165,11 +165,15 @@ public class ManagerWindow
 			Bindings.createDoubleBinding(
 				() -> {
 					Insets i = contentPaneLeft.getInsets();
-					double menuh = menuController.getMenuBar().heightProperty().get();
-					double rooth = root.heightProperty().get();
-					double btnh = btnPatch.heightProperty().get();
-					return rooth - btnh - menuh - i.getTop() - i.getBottom() - contentPaneLeft.getSpacing();
-				}, root.heightProperty(), btnPatch.heightProperty(), menuController.getMenuBar().heightProperty()
+
+					double w = root.getHeight();
+					w -= btnPatch.getHeight();
+					w -= menuController.getMenuBar().getHeight();
+					w -= ( i.getTop() + i.getBottom() );
+					w -= contentPaneLeft.getSpacing();
+
+					return w;
+				}, root.heightProperty()
 			)
 		);
 
