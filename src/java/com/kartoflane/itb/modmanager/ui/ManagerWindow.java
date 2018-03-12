@@ -31,6 +31,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ScrollBar;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.Region;
@@ -50,6 +52,8 @@ public class ManagerWindow
 	protected SplitPane splitPane;
 	@FXML
 	protected VBox contentPaneLeft;
+	@FXML
+	protected ScrollPane scrollPaneRight;
 	@FXML
 	protected VBox contentPaneRight;
 	@FXML
@@ -135,6 +139,21 @@ public class ManagerWindow
 		stage.setMinHeight( 250 );
 		stage.setMinWidth( 250 );
 		stage.setOnCloseRequest( this::onCloseRequest );
+
+		scrollPaneRight.maxWidthProperty().bindBidirectional( scrollPaneRight.prefWidthProperty() );
+		contentPaneRight.maxWidthProperty().bindBidirectional( contentPaneRight.prefWidthProperty() );
+		contentPaneRight.prefWidthProperty().bind(
+			Bindings.createDoubleBinding(
+				() -> {
+					double w = scrollPaneRight.getWidth();
+					ScrollBar sb = UIUtilities.getScrollBar( scrollPaneRight, false );
+					if ( sb != null && sb.isVisible() ) {
+						w -= sb.getWidth();
+					}
+					return w;
+				}, scrollPaneRight.widthProperty(), scrollPaneRight.heightProperty()
+			)
+		);
 
 		root.getChildren().add( 0, menuController.getMenuBar() );
 

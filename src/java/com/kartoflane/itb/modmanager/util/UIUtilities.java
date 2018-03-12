@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -13,10 +14,13 @@ import com.kartoflane.itb.modmanager.ui.UnfocusableCheckBoxTreeCell;
 
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
+import javafx.geometry.Orientation;
 import javafx.geometry.Point3D;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.Hyperlink;
+import javafx.scene.control.ScrollBar;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -64,6 +68,21 @@ public class UIUtilities
 		);
 
 		return result;
+	}
+
+	/**
+	 * Returns a scrollbar from the specified pane, with the specified orientation.
+	 * Null if the scrollbar could not be found, or is not visible.
+	 */
+	public static ScrollBar getScrollBar( ScrollPane pane, boolean horizontal )
+	{
+		Optional<ScrollBar> o = pane.lookupAll( ".scroll-bar" ).stream()
+			.filter( n -> n instanceof ScrollBar )
+			.map( n -> (ScrollBar)n )
+			.filter( sb -> ( sb.getOrientation() == Orientation.HORIZONTAL ) == horizontal )
+			.findFirst();
+
+		return o.isPresent() ? o.get() : null;
 	}
 
 	/**
