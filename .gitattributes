@@ -33,7 +33,3 @@
 *.PDF	 diff=astextplain
 *.rtf	 diff=astextplain
 *.RTF	 diff=astextplain
-
-# JavaFX
-*.css	diff=astextplain
-*.fxml	diff=astextplain
