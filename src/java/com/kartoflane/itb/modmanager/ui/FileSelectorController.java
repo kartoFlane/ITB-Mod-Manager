@@ -55,6 +55,11 @@ public class FileSelectorController
 		textPath.setOnDragDropped( this::onDragDropped );
 	}
 
+	public void requestFocus()
+	{
+		textPath.requestFocus();
+	}
+
 	public SelectorType getType()
 	{
 		return type;

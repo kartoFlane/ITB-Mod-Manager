@@ -82,6 +82,9 @@ public class FileOperationDialogController
 
 			selectors.add( selector );
 			contentPane.getChildren().add( selector.getRoot() );
+
+			if ( i == 0 )
+				selector.requestFocus();
 		}
 
 		stage = new Stage();
