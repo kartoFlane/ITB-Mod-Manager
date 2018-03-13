@@ -18,6 +18,7 @@ import com.kartoflane.itb.modmanager.core.ITBConfig;
 import com.kartoflane.itb.modmanager.core.ModPatchThread;
 import com.kartoflane.itb.modmanager.core.ModsScanner;
 import com.kartoflane.itb.modmanager.util.ITBUtilities;
+import com.kartoflane.itb.modmanager.util.StyledTextBuilder;
 import com.kartoflane.itb.modmanager.util.UIUtilities;
 
 import javafx.application.Platform;
@@ -114,7 +115,7 @@ public class ManagerWindow
 			+ "Thanks for using this mod manager.\n"
 			+ "Make sure to visit the forum for updates!";
 
-		TextFlow flow = UIUtilities.decoratedText( body, contentPaneRight.widthProperty() );
+		TextFlow flow = StyledTextBuilder.build( body, contentPaneRight.widthProperty() );
 		contentPaneRight.getChildren().add( flow );
 	}
 

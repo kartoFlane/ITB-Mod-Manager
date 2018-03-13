@@ -16,6 +16,7 @@ import com.kartoflane.itb.modmanager.core.BackupManager;
 import com.kartoflane.itb.modmanager.core.ITBConfig;
 import com.kartoflane.itb.modmanager.core.ModsScanner;
 import com.kartoflane.itb.modmanager.util.ITBUtilities;
+import com.kartoflane.itb.modmanager.util.StyledTextBuilder;
 import com.kartoflane.itb.modmanager.util.UIUtilities;
 
 import javafx.application.Platform;
@@ -209,7 +210,7 @@ public class MenuController
 			+ "Are you sure you want to continue?";
 		Alert alert = new Alert( AlertType.CONFIRMATION, msg, ButtonType.YES, ButtonType.NO );
 		alert.setHeaderText( "Continue?" );
-		alert.getDialogPane().setContent( UIUtilities.decoratedText( msg, alert.getDialogPane().widthProperty() ) );
+		alert.getDialogPane().setContent( StyledTextBuilder.build( msg, alert.getDialogPane().widthProperty() ) );
 
 		Optional<ButtonType> response = alert.showAndWait();
 
@@ -304,7 +305,7 @@ public class MenuController
 		// Notice
 		if ( updateInfo.getNotice() != null && updateInfo.getNotice().length() > 0 ) {
 			content.getChildren().addAll(
-				UIUtilities.decoratedText( updateInfo.getNotice(), content.widthProperty() ),
+				StyledTextBuilder.build( updateInfo.getNotice(), content.widthProperty() ),
 				new Label()
 			);
 		}
@@ -322,7 +323,7 @@ public class MenuController
 			}
 		}
 
-		content.getChildren().add( UIUtilities.decoratedText( buf.toString(), content.widthProperty() ) );
+		content.getChildren().add( StyledTextBuilder.build( buf.toString(), content.widthProperty() ) );
 
 		ScrollPane root = new ScrollPane();
 		root.setContent( content );

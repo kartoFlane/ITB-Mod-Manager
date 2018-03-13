@@ -28,6 +28,7 @@ import com.kartoflane.itb.modmanager.event.Event;
 import com.kartoflane.itb.modmanager.event.EventSingle;
 import com.kartoflane.itb.modmanager.lua.LuaCatalogReader;
 import com.kartoflane.itb.modmanager.lua.LuaCatalogWriter;
+import com.kartoflane.itb.modmanager.util.StyledTextBuilder;
 import com.kartoflane.itb.modmanager.util.UIUtilities;
 
 import javafx.application.Platform;
@@ -128,7 +129,7 @@ public class ModsScanner
 					+ "But the mod manager has not yet finished scanning the mods/ folder. "
 					+ "Try clicking on this mod again after waiting a few seconds.";
 
-				return UIUtilities.decoratedText( body, widthProperty );
+				return StyledTextBuilder.build( body, widthProperty );
 			}
 			else {
 				Date modDate = modFileDates.get( modHash );
@@ -159,7 +160,7 @@ public class ModsScanner
 
 				bodyBuf.append( "Mods can include an embedded description, but this one did not.\n" );
 
-				return UIUtilities.decoratedText( bodyBuf.toString(), widthProperty );
+				return StyledTextBuilder.build( bodyBuf.toString(), widthProperty );
 			}
 		}
 	}

@@ -2,10 +2,8 @@ package com.kartoflane.itb.modmanager.util;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import com.kartoflane.itb.modmanager.ITBModManager;
 import com.kartoflane.itb.modmanager.ui.UnfocusableCheckBoxTreeCell;
@@ -24,10 +22,8 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.CheckBoxTreeCell;
 import javafx.scene.input.PickResult;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.util.Callback;
-import javafx.util.Pair;
 import javafx.util.StringConverter;
 
 
@@ -172,39 +168,6 @@ public class UIUtilities
 		receiverIndex += insertDirection;
 
 		return receiverIndex;
-	}
-
-	/**
-	 * Creates decorated text from coded input, parsed using {@link BBCodeParser}
-	 * 
-	 * @param input
-	 *            text to be converted to decorated form
-	 * @param widthProperty
-	 *            width property of the container the pane will be inserted into, allowing
-	 *            the pane to layout its children accordingly.
-	 * @return {@link TextFlow} instance containing appropriately styled {@link Node}s
-	 */
-	public static TextFlow decoratedText( String input, ObservableValue<? extends Number> widthProperty )
-	{
-		if ( input == null || input.isEmpty() ) {
-			return new TextFlow();
-		}
-
-		List<Pair<String, String>> styledChunkList = BBCodeParser.parse( input );
-
-		return wrappingTextFlow(
-			widthProperty,
-			styledChunkList.stream()
-				.map( UIUtilities::processStyledChunk )
-				.collect( Collectors.toList() )
-		);
-	}
-
-	private static Node processStyledChunk( Pair<String, String> styledChunk )
-	{
-		Text text = new Text( styledChunk.getKey() );
-		text.setStyle( styledChunk.getValue() );
-		return text;
 	}
 
 	public static TextFlow wrappingTextFlow(

@@ -4,11 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import javafx.util.Pair;
 
 
 /**
@@ -28,20 +26,21 @@ public class BBCodeParser
 	private static final Pattern BB_PTN = Pattern.compile( "\\[\\/?[^\\]]+\\]" );
 	private static final Pattern TEXT_PTN = Pattern.compile( "[^\\[\\]]+" );
 
-	private static final String TAG_BOLD = "b";
-	private static final String TAG_ITALIC = "i";
-	private static final String TAG_SIZE = "size";
-	private static final String TAG_UNDERLINE = "u";
-	private static final String TAG_STRIKETHROUGH = "s";
+	public static final String TAG_BOLD = "b";
+	public static final String TAG_ITALIC = "i";
+	public static final String TAG_SIZE = "size";
+	public static final String TAG_UNDERLINE = "u";
+	public static final String TAG_STRIKETHROUGH = "s";
 
 
 	/**
 	 * @param input
 	 *            text to parse
-	 * @return list of pairs, with pair key being the chunk of text, and pair value
-	 *         being the JavaFX style that is to be applied to that chunk of text
+	 * @return list of pairs, with pair key being the chunk of text to be styled,
+	 *         and value being a list of bbtags which are to be applied to this
+	 *         chunk of text.
 	 */
-	public static List<Pair<String, String>> parse( String input )
+	public static List<Entry<String, List<BBTag>>> parse( String input )
 	{
 		if ( input == null || input.isEmpty() ) {
 			return Collections.emptyList();
@@ -51,7 +50,7 @@ public class BBCodeParser
 		Matcher textMatcher = TEXT_PTN.matcher( input );
 
 		List<BBTag> bbTags = new ArrayList<>();
-		List<Pair<String, String>> chunks = new ArrayList<>();
+		List<Entry<String, List<BBTag>>> chunks = new ArrayList<>();
 
 		int start = 0;
 		int end = input.length();
@@ -88,9 +87,9 @@ public class BBCodeParser
 				start = textMatcher.end();
 
 				chunks.add(
-					Util.pairOf(
+					Util.entryOf(
 						textMatcher.group(),
-						constructStyleFromTagArgs( bbTags )
+						new ArrayList<>( bbTags )
 					)
 				);
 			}
@@ -103,37 +102,8 @@ public class BBCodeParser
 		return chunks;
 	}
 
-	private static String tagToStyle( BBTag tag )
-	{
-		if ( tag.tag.equals( TAG_BOLD ) ) {
-			return "-fx-font-weight: bold;";
-		}
-		else if ( tag.tag.equals( TAG_ITALIC ) ) {
-			return "-fx-font-style: italic;";
-		}
-		else if ( tag.tag.equals( TAG_SIZE ) ) {
-			return "-fx-font-size: " + Integer.parseInt( tag.arg ) + ";";
-		}
-		else if ( tag.tag.equals( TAG_UNDERLINE ) ) {
-			return "-fx-underline: true;";
-		}
-		else if ( tag.tag.equals( TAG_STRIKETHROUGH ) ) {
-			return "-fx-strikethrough: true;";
-		}
-		else {
-			return "";
-		}
-	}
 
-	private static String constructStyleFromTagArgs( List<BBTag> bbtags )
-	{
-		return bbtags.stream()
-			.map( BBCodeParser::tagToStyle )
-			.collect( Collectors.joining() );
-	}
-
-
-	private static class BBTag
+	public static class BBTag
 	{
 		private String tag;
 		private String arg;
@@ -143,6 +113,16 @@ public class BBCodeParser
 		{
 			this.tag = tag.toLowerCase( Locale.ENGLISH );
 			this.arg = arg;
+		}
+
+		public String getTag()
+		{
+			return tag;
+		}
+
+		public String getArg()
+		{
+			return arg;
 		}
 	}
 }
