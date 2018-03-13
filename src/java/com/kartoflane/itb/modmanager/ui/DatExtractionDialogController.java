@@ -64,7 +64,7 @@ public class DatExtractionDialogController extends FileOperationDialogController
 			}
 		}
 		catch ( IOException e ) {
-			log.error( e );
+			log.error( "Error while creating extraction progress dialog.", e );
 		}
 	}
 

@@ -160,7 +160,7 @@ public class MenuController
 			dialog.show();
 		}
 		catch ( IOException e ) {
-			log.error( e );
+			log.error( "Error while creating extract dialog.", e );
 		}
 	}
 
