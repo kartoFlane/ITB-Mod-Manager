@@ -8,7 +8,14 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.AbstractMap;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Predicate;
+
+import javafx.util.Pair;
 
 
 public class Util
@@ -52,5 +59,33 @@ public class Util
 		try ( DirectoryStream<Path> dirStream = Files.newDirectoryStream( directory ) ) {
 			return !dirStream.iterator().hasNext();
 		}
+	}
+
+	/**
+	 * Behaves like {@link Collection#removeIf(Predicate)}, but removes the first
+	 * matched element only.
+	 */
+	public static <T> boolean removeFirstIf( Collection<T> c, Predicate<T> p )
+	{
+		Optional<T> t = c.stream().filter( p ).findFirst();
+		if ( t.isPresent() )
+			return c.remove( t.get() );
+
+		return false;
+	}
+
+	public static <K, V> Pair<K, V> pairOf( K key, V value )
+	{
+		return new Pair<K, V>( key, value );
+	}
+
+	public static <K, V> Map.Entry<K, V> entryOf( K key, V value )
+	{
+		return new AbstractMap.SimpleEntry<K, V>( key, value );
+	}
+
+	public static <K, V> Map.Entry<K, V> immutableEntryOf( K key, V value )
+	{
+		return new AbstractMap.SimpleImmutableEntry<K, V>( key, value );
 	}
 }
