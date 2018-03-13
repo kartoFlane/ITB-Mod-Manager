@@ -110,7 +110,6 @@ public class MenuController
 		menuBar.getMenus().add( mntmUpdate );
 
 		// Temp while those buttons' functions are not implemented yet
-		mntmRepack.setDisable( true );
 		mntmPreferences.setDisable( true );
 	}
 
@@ -167,8 +166,16 @@ public class MenuController
 	@FXML
 	private void onRepackClicked( ActionEvent event )
 	{
-		// TODO repack .dat archives
-		throw new UnsupportedOperationException( "TODO" );
+		try {
+			DatRepackDialogController dialog = new DatRepackDialogController(
+				(Stage)menuBar.getScene().getWindow()
+			);
+
+			dialog.show();
+		}
+		catch ( IOException e ) {
+			log.error( "Error while creating repack dialog.", e );
+		}
 	}
 
 	@FXML
