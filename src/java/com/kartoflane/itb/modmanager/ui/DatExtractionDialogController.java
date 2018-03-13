@@ -4,12 +4,17 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.kartoflane.itb.modmanager.ui.FileSelectorController.SelectorType;
+import com.kartoflane.itb.modmanager.util.Util;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import net.vhati.ftldat.AbstractPack;
 import net.vhati.ftldat.FTLPack;
@@ -37,10 +42,23 @@ public class DatExtractionDialogController extends FileOperationDialogController
 
 			File datFile = files[0];
 			File extractDir = files[1];
-			Thread workerThread = new DatExtractThread( datFile, extractDir, dialog );
-			workerThread.start();
 
-			dialog.show();
+			Optional<ButtonType> response = Optional.of( ButtonType.OK );
+			if ( !Util.isDirectoryEmpty( extractDir.toPath() ) ) {
+				String msg = ""
+					+ "The directory you have specified is not empty:\n\n"
+					+ extractDir.getPath()
+					+ "\n\n"
+					+ "Are you sure you want to extract the archive there?";
+
+				Alert alert = new Alert( AlertType.CONFIRMATION, msg );
+				response = alert.showAndWait();
+			}
+
+			if ( response.isPresent() && response.get() == ButtonType.OK ) {
+				new DatExtractThread( datFile, extractDir, dialog ).start();
+				dialog.show();
+			}
 		}
 		catch ( IOException e ) {
 			log.error( e );

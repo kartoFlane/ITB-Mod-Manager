@@ -2,8 +2,12 @@ package com.kartoflane.itb.modmanager.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Calendar;
 
 
@@ -36,5 +40,17 @@ public class Util
 	public static InputStream getInputStream( String input )
 	{
 		return new ByteArrayInputStream( input.getBytes( StandardCharsets.UTF_8 ) );
+	}
+
+	/**
+	 * Returns true if the directory is empty, false otherwise.
+	 * 
+	 * @source https://stackoverflow.com/a/5937917
+	 */
+	public static boolean isDirectoryEmpty( final Path directory ) throws IOException
+	{
+		try ( DirectoryStream<Path> dirStream = Files.newDirectoryStream( directory ) ) {
+			return !dirStream.iterator().hasNext();
+		}
 	}
 }
