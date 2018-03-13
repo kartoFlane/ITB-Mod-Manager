@@ -317,7 +317,12 @@ public class ManagerWindow
 
 	private void onModSelected( ModFileInfo modFileInfo )
 	{
-		showLocalModInfo( modFileInfo );
+		if ( modFileInfo == null ) {
+			showUsageInformation();
+		}
+		else {
+			showLocalModInfo( modFileInfo );
+		}
 	}
 
 	private void onCloseRequest( WindowEvent e )

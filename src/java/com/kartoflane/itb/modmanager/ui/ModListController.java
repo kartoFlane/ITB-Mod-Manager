@@ -19,6 +19,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -194,7 +195,15 @@ public class ModListController implements ModFileInfoView
 	{
 		if ( event.getButton().equals( MouseButton.PRIMARY ) ) {
 			if ( event.getClickCount() == 1 ) {
-				// TODO: check if any item is here, deselect and show usage info
+				Node node = event.getPickResult().getIntersectedNode();
+				if ( node instanceof CheckBoxTreeCell<?> ) {
+					CheckBoxTreeCell<ModFileInfo> cell = (CheckBoxTreeCell<ModFileInfo>)node;
+					if ( cell.getItem() == null ) {
+						event.consume();
+						treeView.getSelectionModel().clearSelection();
+						modSelected.broadcast( null );
+					}
+				}
 			}
 			else if ( event.getClickCount() == 2 ) {
 				if ( event.getSource() instanceof CheckBoxTreeCell<?> ) {
