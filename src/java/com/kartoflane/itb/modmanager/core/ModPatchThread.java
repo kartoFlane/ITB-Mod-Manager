@@ -239,7 +239,7 @@ public class ModPatchThread extends Thread
 			packContainer.setPackFor( "img/", datPack );
 			packContainer.setPackFor( null, null );
 
-			ModdedDatInfo bakInfo = ModdedDatInfo.build( datPack, infoFileInnerPath );
+			ModdedDatInfo datInfo = ModdedDatInfo.build( datPack, infoFileInnerPath );
 
 			// Track modified innerPaths in case they're clobbered.
 			List<String> moddedItems = new ArrayList<>();
@@ -340,8 +340,8 @@ public class ModPatchThread extends Thread
 					}
 
 					ModInfo modInfo = modInfos.get( i );
-					bakInfo.installedModsNames.add( modInfo.getTitle() );
-					bakInfo.installedModsHashes.add( modInfo.getFileHash() );
+					datInfo.installedModsNames.add( modInfo.getTitle() );
+					datInfo.installedModsHashes.add( modInfo.getFileHash() );
 				}
 				finally {
 					System.gc();
@@ -350,6 +350,13 @@ public class ModPatchThread extends Thread
 				modsInstalled++;
 				patchingProgressChanged.broadcast( progMilestone + progModsMax / modFiles.size() * modsInstalled, progMax );
 			}
+
+			try ( InputStream is = Util.getInputStream( datInfo.toLuaString() ) ) {
+				if ( datPack.contains( infoFileInnerPath ) )
+					datPack.remove( infoFileInnerPath );
+				datPack.add( infoFileInnerPath, is );
+			}
+
 			progMilestone += progModsMax;
 			patchingProgressChanged.broadcast( progMilestone, progMax );
 

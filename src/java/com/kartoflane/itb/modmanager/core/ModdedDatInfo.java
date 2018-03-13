@@ -43,10 +43,11 @@ public class ModdedDatInfo
 		v1.put( "original_hash", originalHash );
 
 		List<Map<String, String>> installedMods = new ArrayList<>( installedModsNames.size() );
-		for ( int i = 0; i < installedMods.size(); i++ ) {
+		for ( int i = 0; i < installedModsNames.size(); i++ ) {
 			Map<String, String> modInfo = new LinkedHashMap<>();
 			modInfo.put( "name", installedModsNames.get( i ) );
 			modInfo.put( "hash", installedModsHashes.get( i ) );
+			installedMods.add( modInfo );
 		}
 		v1.put( "installed_mods", installedMods );
 
