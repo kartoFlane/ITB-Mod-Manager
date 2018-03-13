@@ -26,6 +26,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -152,7 +153,7 @@ public class ManagerWindow
 			Bindings.createDoubleBinding(
 				() -> {
 					double w = scrollPaneRight.getWidth();
-					ScrollBar sb = UIUtilities.getScrollBar( scrollPaneRight, false );
+					ScrollBar sb = UIUtilities.getScrollBar( scrollPaneRight, Orientation.VERTICAL );
 					if ( sb != null && sb.isVisible() ) {
 						w -= sb.getWidth();
 					}

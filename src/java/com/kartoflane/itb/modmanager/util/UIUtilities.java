@@ -74,12 +74,12 @@ public class UIUtilities
 	 * Returns a scrollbar from the specified pane, with the specified orientation.
 	 * Null if the scrollbar could not be found, or is not visible.
 	 */
-	public static ScrollBar getScrollBar( ScrollPane pane, boolean horizontal )
+	public static ScrollBar getScrollBar( ScrollPane pane, Orientation orientation )
 	{
 		Optional<ScrollBar> o = pane.lookupAll( ".scroll-bar" ).stream()
 			.filter( n -> n instanceof ScrollBar )
 			.map( n -> (ScrollBar)n )
-			.filter( sb -> ( sb.getOrientation() == Orientation.HORIZONTAL ) == horizontal )
+			.filter( sb -> sb.getOrientation() == orientation )
 			.findFirst();
 
 		return o.isPresent() ? o.get() : null;
