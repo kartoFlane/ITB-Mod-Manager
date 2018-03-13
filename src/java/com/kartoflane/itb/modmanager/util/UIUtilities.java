@@ -1,16 +1,10 @@
 package com.kartoflane.itb.modmanager.util;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.kartoflane.itb.modmanager.ITBModManager;
@@ -180,125 +174,37 @@ public class UIUtilities
 		return receiverIndex;
 	}
 
+	/**
+	 * Creates decorated text from coded input, parsed using {@link BBCodeParser}
+	 * 
+	 * @param input
+	 *            text to be converted to decorated form
+	 * @param widthProperty
+	 *            width property of the container the pane will be inserted into, allowing
+	 *            the pane to layout its children accordingly.
+	 * @return {@link TextFlow} instance containing appropriately styled {@link Node}s
+	 */
 	public static TextFlow decoratedText( String input, ObservableValue<? extends Number> widthProperty )
 	{
 		if ( input == null || input.isEmpty() ) {
 			return new TextFlow();
 		}
 
-		List<Pair<String, String>> chunkStyleList = parseDecoratedText( input );
+		List<Pair<String, String>> styledChunkList = BBCodeParser.parse( input );
 
-		List<Node> chunks = chunkStyleList.stream()
-			.map( UIUtilities::processChunkStyle )
-			.collect( Collectors.toList() );
-
-		return wrappingTextFlow( widthProperty, chunks );
+		return wrappingTextFlow(
+			widthProperty,
+			styledChunkList.stream()
+				.map( UIUtilities::processStyledChunk )
+				.collect( Collectors.toList() )
+		);
 	}
 
-	private static Node processChunkStyle( Pair<String, String> chunkStyle )
+	private static Node processStyledChunk( Pair<String, String> styledChunk )
 	{
-		Text text = new Text( chunkStyle.getKey() );
-		text.setStyle( chunkStyle.getValue() );
+		Text text = new Text( styledChunk.getKey() );
+		text.setStyle( styledChunk.getValue() );
 		return text;
-	}
-
-	/**
-	 * Parses the specified input text using a kind of BBCode-like syntax to
-	 * achieve decorated text.
-	 * Currently supports:
-	 * - bold via [b][/b]
-	 * - italic via [i][/i]
-	 * - size via [size=#][/size]
-	 */
-	public static List<Pair<String, String>> parseDecoratedText( String input )
-	{
-		if ( input == null || input.isEmpty() ) {
-			return Collections.emptyList();
-		}
-
-		final Pattern bbPtn = Pattern.compile( "\\[\\/?[^\\]]+\\]" );
-		final Pattern normalPtn = Pattern.compile( "[^\\[\\]]+" );
-
-		Matcher bbM = bbPtn.matcher( input );
-		Matcher normalM = normalPtn.matcher( input );
-
-		List<Entry<String, String>> tagsArgs = new ArrayList<>();
-		List<Pair<String, String>> chunks = new ArrayList<>();
-
-		int start = 0;
-		int end = input.length();
-		while ( start < end ) {
-			int i = -1;
-			int j = -1;
-
-			if ( bbM.find( start ) ) i = bbM.start();
-			if ( normalM.find( start ) ) j = normalM.start();
-
-			if ( i != -1 && ( i < j || j == -1 ) ) {
-				String tag = bbM.group();
-				start = bbM.start() + tag.length();
-
-				boolean closing = tag.startsWith( "[/" );
-				tag = tag.replaceAll( "[\\[\\]\\/]", "" );
-
-				if ( closing ) {
-					final String key = tag;
-					Util.removeFirstIf( tagsArgs, e -> e.getKey().equals( key ) );
-				}
-				else {
-					String arg = null;
-					int idx = tag.indexOf( '=' );
-					if ( idx >= 0 ) {
-						arg = tag.substring( idx + 1 );
-						tag = tag.substring( 0, idx );
-					}
-					tagsArgs.add( Util.entryOf( tag, arg ) );
-				}
-			}
-			else if ( j != -1 && ( i > j || i == -1 ) ) {
-				start = normalM.end();
-
-				chunks.add(
-					Util.pairOf(
-						normalM.group(),
-						constructStyleFromTags( tagsArgs )
-					)
-				);
-			}
-			else {
-				break;
-			}
-		}
-
-		return chunks;
-	}
-
-	private static String constructStyleFromTags( List<Entry<String, String>> tagsArgs )
-	{
-		final String tagBold = "b";
-		final String tagItalic = "i";
-		final String tagSize = "size";
-
-		return tagsArgs.stream()
-			.map(
-				tagArg -> {
-					String tag = tagArg.getKey().toLowerCase( Locale.ENGLISH );
-					String arg = tagArg.getValue();
-
-					if ( tag.equals( tagBold ) ) {
-						return "-fx-font-weight: bold;";
-					}
-					else if ( tag.equals( tagItalic ) ) {
-						return "-fx-font-style: italic;";
-					}
-					else if ( tag.startsWith( tagSize ) ) {
-						return "-fx-font-size: " + Integer.parseInt( arg ) + ";";
-					}
-					else {
-						return "";
-					}
-				}
-			).collect( Collectors.joining() );
 	}
 
 	public static TextFlow wrappingTextFlow(
