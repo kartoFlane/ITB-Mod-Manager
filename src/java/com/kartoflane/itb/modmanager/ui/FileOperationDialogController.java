@@ -20,6 +20,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -44,13 +45,14 @@ public class FileOperationDialogController
 	@FXML
 	protected HBox buttonsPane;
 	@FXML
+	protected CheckBox btnKeepOpen;
+	@FXML
 	protected Button btnOk;
 	@FXML
 	protected Button btnCancel;
 
 	protected List<FileSelectorController> selectors = null;
 	protected Consumer<File[]> fileOperation = null;
-	protected boolean closeOnAccept = false;
 
 	protected Stage stage = null;
 
@@ -90,7 +92,7 @@ public class FileOperationDialogController
 		stage.initModality( Modality.APPLICATION_MODAL );
 	}
 
-	protected void layoutLabels()
+	protected void init()
 	{
 		double maxWidth = selectors.stream()
 			.map( selector -> selector.labelWidthProperty().get() )
@@ -109,9 +111,9 @@ public class FileOperationDialogController
 		btnOk.setText( text );
 	}
 
-	public void setCloseOnAccept( boolean close )
+	public void setKeepOpen( boolean keepOpen )
 	{
-		closeOnAccept = close;
+		btnKeepOpen.setSelected( keepOpen );
 	}
 
 	public void setFileOperation( Consumer<File[]> operation )
@@ -140,7 +142,7 @@ public class FileOperationDialogController
 	public void show()
 	{
 		stage.show();
-		layoutLabels();
+		init();
 	}
 
 	/**
@@ -149,7 +151,7 @@ public class FileOperationDialogController
 	public void showAndWait()
 	{
 		stage.show();
-		layoutLabels();
+		init();
 		stage.hide();
 
 		stage.showAndWait();
@@ -170,7 +172,7 @@ public class FileOperationDialogController
 			return;
 		}
 
-		if ( closeOnAccept ) {
+		if ( !btnKeepOpen.isSelected() ) {
 			stage.fireEvent( new WindowEvent( stage, WindowEvent.WINDOW_CLOSE_REQUEST ) );
 		}
 

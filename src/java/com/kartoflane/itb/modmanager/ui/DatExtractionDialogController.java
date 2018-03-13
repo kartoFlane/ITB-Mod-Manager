@@ -26,7 +26,7 @@ public class DatExtractionDialogController extends FileOperationDialogController
 		setTitle( "Extract .dats" );
 		setOkButtonText( "Extract" );
 		setFileOperation( this::extractFiles );
-		setCloseOnAccept( true );
+		setKeepOpen( false );
 	}
 
 	public void extractFiles( File[] files )
