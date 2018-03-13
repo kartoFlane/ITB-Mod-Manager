@@ -52,7 +52,7 @@ public class DatExtractionDialogController extends FileOperationDialogController
 					+ "The directory you have specified is not empty:\n\n"
 					+ extractDir.getPath()
 					+ "\n\n"
-					+ "Are you sure you want to extract the archive there?";
+					+ "Are you sure you want to continue?";
 
 				Alert alert = new Alert( AlertType.CONFIRMATION, msg );
 				response = alert.showAndWait();

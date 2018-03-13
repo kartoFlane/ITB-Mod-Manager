@@ -11,9 +11,9 @@
 			<items>
 				<MenuItem fx:id="mntmRescan" text="Rescan _mods/" onAction="#onRescanClicked" />
 				<SeparatorMenuItem />
-				<MenuItem fx:id="mntmExtract" text="_Extract .dat"
+				<MenuItem fx:id="mntmExtract" text="_Extract .dat..."
 					onAction="#onExtractClicked" />
-				<MenuItem fx:id="mntmRepack" text="_Repack .dat" onAction="#onRepackClicked" />
+				<MenuItem fx:id="mntmRepack" text="_Repack .dat..." onAction="#onRepackClicked" />
 				<SeparatorMenuItem />
 				<MenuItem fx:id="mntmPreferences" text="_Preferences"
 					onAction="#onPreferencesClicked" />
