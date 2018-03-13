@@ -32,6 +32,7 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import net.vhati.modmanager.core.AutoUpdateInfo;
@@ -109,7 +110,6 @@ public class MenuController
 		menuBar.getMenus().add( mntmUpdate );
 
 		// Temp while those buttons' functions are not implemented yet
-		mntmExtract.setDisable( true );
 		mntmRepack.setDisable( true );
 		mntmPreferences.setDisable( true );
 	}
@@ -152,8 +152,16 @@ public class MenuController
 	@FXML
 	private void onExtractClicked( ActionEvent event )
 	{
-		// TODO extract .dat archives
-		throw new UnsupportedOperationException( "TODO" );
+		try {
+			DatExtractionDialogController dialog = new DatExtractionDialogController(
+				(Stage)menuBar.getScene().getWindow()
+			);
+
+			dialog.show();
+		}
+		catch ( IOException e ) {
+			log.error( e );
+		}
 	}
 
 	@FXML
