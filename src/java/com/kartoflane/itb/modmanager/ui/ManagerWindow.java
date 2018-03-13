@@ -92,13 +92,12 @@ public class ManagerWindow
 		this.menuController = new MenuController( config, modsScanner, backupManager, modListController );
 
 		createGUI();
-
-		showUsageInformation();
 	}
 
 	public void show()
 	{
 		stage.show();
+		showUsageInformation();
 	}
 
 	public void showUsageInformation()
@@ -107,7 +106,8 @@ public class ManagerWindow
 
 		String body = ""
 			+ "- Drag to reorder mods.\n"
-			+ "- Click the checkboxes (or doubleclick) to select mods to load.\n"
+			+ "- Select mods to install by clicking the checkboxes "
+			+ "( you can also doubleclick, or press spacebar/enter )\n"
 			+ "- Click 'Patch' to apply mods ( select none for vanilla ).\n"
 			+ "\n"
 			+ "Thanks for using this mod manager.\n"
