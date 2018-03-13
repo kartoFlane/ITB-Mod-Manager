@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.kartoflane.itb.modmanager.ui.FileSelectorController.SelectorType;
 
 import javafx.event.ActionEvent;
@@ -14,6 +17,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
@@ -25,6 +30,8 @@ import javafx.stage.WindowEvent;
 
 public class FileOperationDialogController
 {
+	protected static final Logger log = LogManager.getLogger();
+
 	@FXML
 	protected ScrollPane scrollPane;
 	@FXML
@@ -136,18 +143,44 @@ public class FileOperationDialogController
 	 */
 	public void showAndWait()
 	{
+		stage.show();
+		layoutLabels();
+		stage.hide();
+
 		stage.showAndWait();
 	}
 
 	@FXML
 	protected void onOkClicked( ActionEvent e )
 	{
+		boolean anyEmpty = selectors.stream()
+			.map( selector -> selector.getSelectedPath() )
+			.anyMatch( path -> path == null || path.isEmpty() );
+
+		if ( anyEmpty ) {
+			String msg = ""
+				+ "One or more fields are still empty.\n\n"
+				+ "Please fill out all fields before proceeding.";
+			new Alert( AlertType.WARNING, msg ).show();
+			return;
+		}
+
 		if ( closeOnAccept ) {
 			stage.fireEvent( new WindowEvent( stage, WindowEvent.WINDOW_CLOSE_REQUEST ) );
 		}
 
 		if ( fileOperation != null ) {
-			fileOperation.accept( getFiles() );
+			try {
+				fileOperation.accept( getFiles() );
+			}
+			catch ( Exception ex ) {
+				log.error( "Error while executing file dialog's operation:", ex );
+				String msg = ""
+					+ "An error has occurred while executing requested operation:\n\n"
+					+ ex.getMessage();
+
+				new Alert( AlertType.ERROR, msg ).show();
+			}
 		}
 	}
 

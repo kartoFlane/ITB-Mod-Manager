@@ -6,9 +6,6 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.kartoflane.itb.modmanager.ui.FileSelectorController.SelectorType;
 import com.kartoflane.itb.modmanager.util.Util;
 
@@ -23,9 +20,6 @@ import net.vhati.ftldat.FolderPack;
 
 public class DatExtractionDialogController extends FileOperationDialogController
 {
-	private static final Logger log = LogManager.getLogger();
-
-
 	public DatExtractionDialogController( Stage owner ) throws IOException
 	{
 		super( owner, SelectorType.alternatingFile( 2 ), "File to extract:", "Destination:" );
@@ -42,6 +36,15 @@ public class DatExtractionDialogController extends FileOperationDialogController
 
 			File datFile = files[0];
 			File extractDir = files[1];
+
+			if ( !datFile.isFile() ) {
+				new Alert( AlertType.ERROR, "Not a file:\n\n" + datFile.getPath() ).show();
+				return;
+			}
+			if ( !extractDir.isDirectory() ) {
+				new Alert( AlertType.ERROR, "Not a directory:\n\n" + extractDir.getPath() ).show();
+				return;
+			}
 
 			Optional<ButtonType> response = Optional.of( ButtonType.OK );
 			if ( !Util.isDirectoryEmpty( extractDir.toPath() ) ) {
