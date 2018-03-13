@@ -158,6 +158,12 @@ public class FileSelectorController
 		FILE,
 		DIRECTORY;
 
+		public static final SelectorType[] FILE_AND_DIR = alternatingFile( 2 );
+		public static final SelectorType[] DIR_AND_FILE = alternatingDir( 2 );
+		public static final SelectorType[] TWO_FILES = files( 2 );
+		public static final SelectorType[] TWO_DIRS = directories( 2 );
+
+
 		/**
 		 * Returns an array of specified length, with all values equal to {@link FILE}.
 		 */

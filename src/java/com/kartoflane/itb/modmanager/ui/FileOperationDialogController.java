@@ -28,6 +28,11 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 
+/**
+ * A generic dialog for performing operations on any number of selectable files.
+ * 
+ * @author kartoFlane
+ */
 public class FileOperationDialogController
 {
 	protected static final Logger log = LogManager.getLogger();

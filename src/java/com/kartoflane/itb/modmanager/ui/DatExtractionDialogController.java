@@ -22,7 +22,7 @@ public class DatExtractionDialogController extends FileOperationDialogController
 {
 	public DatExtractionDialogController( Stage owner ) throws IOException
 	{
-		super( owner, SelectorType.alternatingFile( 2 ), "File to extract:", "Destination:" );
+		super( owner, SelectorType.FILE_AND_DIR, "File to extract:", "Destination:" );
 		setTitle( "Extract .dats" );
 		setOkButtonText( "Extract" );
 		setFileOperation( this::extractFiles );

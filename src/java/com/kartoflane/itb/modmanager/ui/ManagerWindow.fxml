@@ -16,7 +16,7 @@
 		VBox.vgrow="ALWAYS">
 		<items>
 			<VBox fx:id="contentPaneLeft" alignment="top_center" spacing="10"
-				minWidth="180">
+				minWidth="200">
 				<padding>
 					<Insets bottom="10" left="10" right="10" top="10" />
 				</padding>
@@ -28,7 +28,7 @@
 						text="Patch" />
 				</HBox>
 			</VBox>
-			<ScrollPane fx:id="scrollPaneRight" minWidth="100">
+			<ScrollPane fx:id="scrollPaneRight" minWidth="200">
 				<content>
 					<VBox fx:id="contentPaneRight" alignment="top_left" spacing="10">
 						<padding>
