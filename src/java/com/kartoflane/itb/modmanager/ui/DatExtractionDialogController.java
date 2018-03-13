@@ -26,7 +26,29 @@ public class DatExtractionDialogController extends FileOperationDialogController
 		setTitle( "Extract .dats" );
 		setOkButtonText( "Extract" );
 		setFileOperation( this::extractFiles );
+		setAcceptancePredicate( this::testFiles );
 		setKeepOpen( false );
+	}
+
+	public boolean testFiles( File[] files )
+	{
+		File datFile = files[0];
+		File extractDir = files[1];
+
+		if ( !datFile.exists() ) {
+			new Alert( AlertType.ERROR, "Specified file doesn't exist:\n\n" + datFile.getPath() ).show();
+			return false;
+		}
+		if ( !datFile.isFile() ) {
+			new Alert( AlertType.ERROR, "Not a file:\n\n" + datFile.getPath() ).show();
+			return false;
+		}
+		if ( extractDir.exists() && !extractDir.isDirectory() ) {
+			new Alert( AlertType.ERROR, "Not a directory:\n\n" + extractDir.getPath() ).show();
+			return false;
+		}
+
+		return true;
 	}
 
 	public void extractFiles( File[] files )
@@ -37,20 +59,13 @@ public class DatExtractionDialogController extends FileOperationDialogController
 			File datFile = files[0];
 			File extractDir = files[1];
 
-			if ( !datFile.isFile() ) {
-				new Alert( AlertType.ERROR, "Not a file:\n\n" + datFile.getPath() ).show();
-				return;
-			}
-			if ( !extractDir.isDirectory() ) {
-				new Alert( AlertType.ERROR, "Not a directory:\n\n" + extractDir.getPath() ).show();
-				return;
-			}
-
 			Optional<ButtonType> response = Optional.of( ButtonType.OK );
 			if ( !Util.isDirectoryEmpty( extractDir.toPath() ) ) {
 				String msg = ""
-					+ "The directory you have specified is not empty:\n\n"
+					+ "The destination directory you have specified is not empty:\n\n"
 					+ extractDir.getPath()
+					+ "\n\n"
+					+ "Some files might be overwritten during extraction."
 					+ "\n\n"
 					+ "Are you sure you want to continue?";
 
@@ -86,11 +101,6 @@ public class DatExtractionDialogController extends FileOperationDialogController
 		@Override
 		public void run()
 		{
-			if ( !datFile.exists() ) {
-				dialog.setStatusTextLater( "File doesn't exist: " + datFile.getPath() );
-				dialog.setTaskOutcomeLater( false, null );
-				return;
-			}
 			if ( !extractDir.exists() )
 				extractDir.mkdirs();
 

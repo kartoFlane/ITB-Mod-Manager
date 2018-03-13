@@ -31,7 +31,29 @@ public class DatRepackDialogController extends FileOperationDialogController
 		setTitle( "Repack .dat" );
 		setOkButtonText( "Repack" );
 		setFileOperation( this::repackFiles );
+		setAcceptancePredicate( this::testFiles );
 		setKeepOpen( false );
+	}
+
+	public boolean testFiles( File[] files )
+	{
+		File repackDir = files[0];
+		File datFile = files[1];
+
+		if ( !repackDir.exists() ) {
+			new Alert( AlertType.ERROR, "Specified directory doesn't exist::\n\n" + repackDir.getPath() ).show();
+			return false;
+		}
+		if ( !repackDir.isDirectory() ) {
+			new Alert( AlertType.ERROR, "Not a directory:\n\n" + repackDir.getPath() ).show();
+			return false;
+		}
+		if ( datFile.exists() && !datFile.isFile() ) {
+			new Alert( AlertType.ERROR, "Not a file:\n\n" + datFile.getPath() ).show();
+			return false;
+		}
+		
+		return true;
 	}
 
 	public void repackFiles( File[] files )

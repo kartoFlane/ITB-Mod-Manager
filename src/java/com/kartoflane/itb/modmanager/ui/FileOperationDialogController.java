@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -53,6 +54,7 @@ public class FileOperationDialogController
 
 	protected List<FileSelectorController> selectors = null;
 	protected Consumer<File[]> fileOperation = null;
+	protected Predicate<File[]> acceptPredicate = null;
 
 	protected Stage stage = null;
 
@@ -119,9 +121,23 @@ public class FileOperationDialogController
 		btnKeepOpen.setSelected( keepOpen );
 	}
 
+	/**
+	 * The operation to execute on files selected in this dialog.
+	 */
 	public void setFileOperation( Consumer<File[]> operation )
 	{
 		fileOperation = operation;
+	}
+
+	/**
+	 * Sets acceptance predicate, fired when user clicks the OK button.
+	 * If this function returns false, the file operation set in this
+	 * dialog will not be executed.
+	 * Can be null.
+	 */
+	public void setAcceptancePredicate( Predicate<File[]> pred )
+	{
+		acceptPredicate = pred;
 	}
 
 	public int getFileCount()
@@ -175,13 +191,18 @@ public class FileOperationDialogController
 			return;
 		}
 
+		File[] files = getFiles();
+		if ( acceptPredicate != null && !acceptPredicate.test( files ) ) {
+			return;
+		}
+
 		if ( !btnKeepOpen.isSelected() ) {
 			stage.fireEvent( new WindowEvent( stage, WindowEvent.WINDOW_CLOSE_REQUEST ) );
 		}
 
 		if ( fileOperation != null ) {
 			try {
-				fileOperation.accept( getFiles() );
+				fileOperation.accept( files );
 			}
 			catch ( Exception ex ) {
 				log.error( "Error while executing file dialog's operation:", ex );

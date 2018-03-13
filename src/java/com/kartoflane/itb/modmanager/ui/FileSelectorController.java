@@ -136,6 +136,9 @@ public class FileSelectorController
 			if ( db.hasString() ) {
 				path += db.getString();
 			}
+			else if ( db.hasFiles() ) {
+				path += db.getFiles().get( 0 ).getPath();
+			}
 			else if ( db.hasUrl() ) {
 				try {
 					URL url = new URL( db.getUrl() );
@@ -146,9 +149,6 @@ public class FileSelectorController
 					e.consume();
 					return;
 				}
-			}
-			else if ( db.hasFiles() ) {
-				path += db.getFiles().get( 0 ).getPath();
 			}
 
 			textPath.setText( path );
