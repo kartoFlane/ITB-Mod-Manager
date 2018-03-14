@@ -162,8 +162,7 @@ public class ITBModManager extends Application
 
 						if ( config.getPropertyAsBoolean( ITBConfig.LOAD_PREV_MODS, true ) ) {
 							try {
-								File dat = new File( resourcesDir, "resource.dat" );
-								ModdedDatInfo datInfo = ModdedDatInfo.build( dat, ModPatchThread.MODDED_INFO_INNERPATH );
+								ModdedDatInfo datInfo = ModdedDatInfo.build( resourceDatFile, ModPatchThread.MODDED_INFO_INNERPATH );
 								managerWindow.onInstalledModsLoaded( datInfo.listInstalledMods() );
 							}
 							catch ( IOException e ) {
