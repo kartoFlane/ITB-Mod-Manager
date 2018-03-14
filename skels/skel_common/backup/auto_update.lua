@@ -1,7 +1,7 @@
 {
 	v1 = {
 		latest = {
-			version = "dev",
+			version = "dev-1",
 			urls = {
 				Github = "https://github.com/kartoFlane/ITB-Mod-Manager"
 			},
@@ -9,10 +9,10 @@
 		},
 		changelog = {
 			{
-				version = "dev",
+				version = "dev-1",
 				hidden = false,
 				changes = {
-					"Development release."
+					"In-development release. Nothing is stable, everything is temporary."
 				}
 			}
 		}

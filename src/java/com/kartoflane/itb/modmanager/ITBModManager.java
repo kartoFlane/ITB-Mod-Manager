@@ -6,7 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,7 +27,6 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import net.vhati.modmanager.core.AutoUpdateInfo;
 import net.vhati.modmanager.core.ComparableVersion;
 
 
@@ -36,7 +34,7 @@ public class ITBModManager extends Application
 {
 	private static final Logger log = LogManager.getLogger();
 
-	public static final ComparableVersion APP_VERSION = new ComparableVersion( "dev" );
+	public static final ComparableVersion APP_VERSION = new ComparableVersion( "dev-1" );
 	public static final String APP_NAME = "Into The Breach Mod Manager";
 	public static final String APP_AUTHOR = "kartoFlane";
 	public static final String APP_URL = "http://www.subsetgames.com/forum/viewforum.php?f=26"; // TODO forum link
@@ -150,10 +148,8 @@ public class ITBModManager extends Application
 			);
 
 			ManagerWindow managerWindow = new ManagerWindow( config, modsScanner, backupManager, gameDir );
+			appVersionChecker.updateAvailableEvent().addListener( managerWindow::onUpdateAvailable );
 			managerWindow.show();
-
-			Consumer<AutoUpdateInfo> onUpdateAvailable = managerWindow::onUpdateAvailable;
-			appVersionChecker.updateAvailableEvent().addListener( onUpdateAvailable );
 
 			Thread initThread = new Thread(
 				() -> {
@@ -174,9 +170,6 @@ public class ITBModManager extends Application
 					}
 					catch ( Exception e ) {
 						log.error( "Error during ManagerWindow init.", e );
-					}
-					finally {
-						appVersionChecker.updateAvailableEvent().removeListener( onUpdateAvailable );
 					}
 				}
 			);

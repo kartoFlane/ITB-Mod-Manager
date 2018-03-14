@@ -273,7 +273,6 @@ public class ManagerWindow
 		boolean strict = false;
 
 		if ( strict ) {
-			log.trace( "Loading list of installed mods using strict matching." );
 			// Very reliable, always selects the correct mods, but slow to load.
 			// Realistically not very useful, as the user will have made his selection
 			// by the time this is ready.
@@ -284,7 +283,6 @@ public class ManagerWindow
 			);
 		}
 		else {
-			log.trace( "Loading list of installed mods using sloppy matching." );
 			// Fast, but might fail for some mods, or incorretly select some mods.
 			// But should be fine most of the time.
 			selectInstalledModsSloppy(
@@ -298,17 +296,18 @@ public class ManagerWindow
 	private void selectInstalledModsStrict( List<String> hashes )
 	{
 		modsScanner.scanningStateChangedEvent().addListenerSelfCleaning(
-			scanning -> {
-				Platform.runLater(
-					() -> modListController.selectMods(
+			scanning -> Platform.runLater(
+				() -> {
+					log.trace( "Loading list of installed mods using strict matching." );
+					modListController.selectMods(
 						hashes.stream()
 							.map( hash -> modsScanner.getFileForHash( hash ) )
 							.filter( file -> file != null )
 							.collect( Collectors.toList() ),
 						File.class
-					)
-				);
-			},
+					);
+				}
+			),
 			scanning -> !scanning
 		);
 	}
@@ -316,16 +315,18 @@ public class ManagerWindow
 	private void selectInstalledModsSloppy( List<String> fileNames )
 	{
 		modsScanner.modsTableStateAmendedEvent().addListenerSelfCleaning(
-			listState -> {
-				Platform.runLater(
-					() -> modListController.selectMods(
+			listState -> Platform.runLater(
+				() -> {
+					log.trace( "Loading list of installed mods using sloppy matching." );
+					modListController.selectMods(
 						modListController.getCurrentModsTableState().getItems().stream()
 							.filter( modFileInfo -> fileNames.contains( modFileInfo.getName() ) )
 							.collect( Collectors.toList() ),
 						ModFileInfo.class
-					)
-				);
-			}, null
+					);
+				}
+			),
+			null
 		);
 	}
 
