@@ -65,7 +65,6 @@ public class URLFetcher
 		}
 
 		HttpGet request = null;
-		OutputStream localOut = null;
 		String remoteETag = null;
 
 		RequestConfig requestConfig = RequestConfig.custom()
@@ -91,11 +90,11 @@ public class URLFetcher
 
 			int status = response.getStatusLine().getStatusCode();
 			if ( status >= 200 && status < 300 ) {
-
 				HttpEntity entity = response.getEntity();
 				if ( entity != null ) {
-					localOut = new FileOutputStream( localFile );
-					entity.writeTo( localOut );
+					try ( OutputStream localOut = new FileOutputStream( localFile ) ) {
+						entity.writeTo( localOut );
+					}
 				}
 
 				if ( response.containsHeader( "ETag" ) ) {
@@ -122,12 +121,6 @@ public class URLFetcher
 			return false;
 		}
 		finally {
-			try {
-				if ( localOut != null ) localOut.close();
-			}
-			catch ( IOException e ) {
-			}
-
 			try {
 				httpClient.close();
 			}

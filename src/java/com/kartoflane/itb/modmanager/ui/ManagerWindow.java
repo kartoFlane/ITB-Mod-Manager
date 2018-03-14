@@ -284,12 +284,12 @@ public class ManagerWindow
 				ModPatchDialogController patchDialog = new ModPatchDialogController( stage, true );
 
 				// Offer to run Into the Breach.
-				if ( !"true".equals( config.getProperty( ITBConfig.NEVER_RUN_ITB, "false" ) ) ) {
+				if ( !config.getPropertyAsBoolean( ITBConfig.NEVER_RUN_ITB, false ) ) {
 					Path exePath = null;
 					String[] exeArgs = null;
 
 					// Try to run via Steam.
-					if ( "true".equals( config.getProperty( ITBConfig.RUN_STEAM_ITB, "false" ) ) ) {
+					if ( config.getPropertyAsBoolean( ITBConfig.RUN_STEAM_ITB, false ) ) {
 						String steamPath = config.getProperty( ITBConfig.STEAM_EXE_PATH );
 						if ( steamPath.length() > 0 ) {
 							exePath = Paths.get( steamPath );

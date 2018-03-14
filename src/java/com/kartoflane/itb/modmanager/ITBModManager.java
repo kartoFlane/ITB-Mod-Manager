@@ -193,7 +193,7 @@ public class ITBModManager extends Application
 		}
 
 		// If this is a Steam distro.
-		if ( "true".equals( config.getProperty( ITBConfig.STEAM_DISTRO, "false" ) ) ) {
+		if ( config.getPropertyAsBoolean( ITBConfig.STEAM_DISTRO, false ) ) {
 			// Find Steam's executable.
 			if ( config.getProperty( ITBConfig.STEAM_EXE_PATH, "" ).length() == 0 ) {
 				Path steamExePath = ITBUtilities.findSteamExe();

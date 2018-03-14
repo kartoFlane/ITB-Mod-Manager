@@ -214,7 +214,7 @@ public class ModsScanner
 		scanningStateChanged.broadcast( true );
 		modFileHashes.clear();
 
-		boolean allowZip = config.getProperty( ITBConfig.ALLOW_ZIP, "false" ).equals( "true" );
+		boolean allowZip = config.getPropertyAsBoolean( ITBConfig.ALLOW_ZIP, false );
 		File[] modFiles = modsDir.listFiles( new ModFileFilter( allowZip ) );
 
 		List<ModFileInfo> unsortedMods = new ArrayList<ModFileInfo>();
