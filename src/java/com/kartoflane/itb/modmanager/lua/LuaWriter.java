@@ -45,9 +45,6 @@ public class LuaWriter
 		if ( o == null ) {
 			buf.append( "nil" );
 		}
-		else if ( o instanceof String ) {
-			buf.append( '\"' ).append( (String)o ).append( '\"' );
-		}
 		else if ( o instanceof Character ) {
 			buf.append( (Character)o );
 		}
@@ -65,6 +62,9 @@ public class LuaWriter
 		}
 		else if ( o instanceof Double ) {
 			buf.append( (Double)o );
+		}
+		else if ( o instanceof String ) {
+			appendString( buf, (String)o, indent );
 		}
 		else if ( o instanceof Map<?, ?> ) {
 			appendTable( buf, (Map<String, ?>)o, indent );
@@ -125,6 +125,13 @@ public class LuaWriter
 		buf.append( '}' );
 
 		return buf;
+	}
+
+	private static StringBuilder appendString( StringBuilder buf, String string, int indent )
+	{
+		// Normalize and escape newlines
+		string = string.replaceAll( "\r?\n", "\\\\n" );
+		return buf.append( '\"' ).append( string ).append( '\"' );
 	}
 
 	private static StringBuilder appendIndent( StringBuilder buf, int indentLevel )
