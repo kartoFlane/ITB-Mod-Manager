@@ -98,7 +98,7 @@ public class MenuController
 
 	private void createGUI() throws IOException
 	{
-		FXMLLoader loader = new FXMLLoader( getClass().getResource( "MenuBar.fxml" ) );
+		FXMLLoader loader = new FXMLLoader( getClass().getResource( "/MenuBar.fxml" ) );
 		loader.setController( this );
 		loader.load();
 

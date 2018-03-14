@@ -42,7 +42,7 @@ public class ProgressDialogController
 
 	protected void createGUI( Stage owner ) throws IOException
 	{
-		FXMLLoader loader = new FXMLLoader( getClass().getResource( "ProgressDialog.fxml" ) );
+		FXMLLoader loader = new FXMLLoader( getClass().getResource( "/ProgressDialog.fxml" ) );
 		loader.setController( this );
 		Parent root = loader.load();
 

@@ -145,12 +145,12 @@ public class ManagerWindow
 
 	protected void createGUI() throws IOException
 	{
-		FXMLLoader loader = new FXMLLoader( getClass().getResource( "ManagerWindow.fxml" ) );
+		FXMLLoader loader = new FXMLLoader( getClass().getResource( "/ManagerWindow.fxml" ) );
 		loader.setController( this );
 		VBox root = loader.load();
 
 		Scene scene = new Scene( root, 500, 400 );
-		scene.getStylesheets().add( ITBModManager.class.getResource( "application.css" ).toExternalForm() );
+		scene.getStylesheets().add( getClass().getResource( "/application.css" ).toExternalForm() );
 
 		stage = new Stage();
 		stage.setTitle( ITBModManager.APP_NAME );

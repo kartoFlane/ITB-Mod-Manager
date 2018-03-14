@@ -42,7 +42,7 @@ public class FileSelectorController
 
 	private void createGUI( String labelText ) throws IOException
 	{
-		FXMLLoader loader = new FXMLLoader( getClass().getResource( "FileSelector.fxml" ) );
+		FXMLLoader loader = new FXMLLoader( getClass().getResource( "/FileSelector.fxml" ) );
 		loader.setController( this );
 		loader.load();
 

@@ -75,7 +75,7 @@ public class ModListController
 
 	protected void createGUI() throws IOException
 	{
-		FXMLLoader loader = new FXMLLoader( getClass().getResource( "ModList.fxml" ) );
+		FXMLLoader loader = new FXMLLoader( getClass().getResource( "/ModList.fxml" ) );
 		loader.setController( this );
 		loader.load();
 

@@ -73,7 +73,7 @@ public class FileOperationDialogController
 
 	protected void createGUI( Stage owner, SelectorType[] types, String[] labels ) throws IOException
 	{
-		FXMLLoader loader = new FXMLLoader( getClass().getResource( "FileOperationDialog.fxml" ) );
+		FXMLLoader loader = new FXMLLoader( getClass().getResource( "/FileOperationDialog.fxml" ) );
 		loader.setController( this );
 		Parent root = loader.load();
 
