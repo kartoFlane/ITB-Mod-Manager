@@ -21,31 +21,31 @@ import com.kartoflane.itb.modmanager.util.Util;
 
 import net.vhati.ftldat.AbstractPack;
 import net.vhati.ftldat.FTLPack;
-import net.vhati.modmanager.core.ModInfo;
 
 
 public class ModdedDatInfo
 {
 	private String originalHash;
-	private List<String> installedModNames;
+	private List<String> installedModFileNames;
 	private List<String> installedModHashes;
 
 
 	private ModdedDatInfo()
 	{
-		installedModNames = new ArrayList<>();
+		installedModFileNames = new ArrayList<>();
 		installedModHashes = new ArrayList<>();
 	}
 
 	public ModdedDatInfo( String hash )
 	{
+		this();
 		originalHash = hash;
 	}
 
-	public void addModInfo( ModInfo modInfo )
+	public void addModInfo( String fileName, String hash )
 	{
-		installedModNames.add( modInfo.getTitle() );
-		installedModHashes.add( modInfo.getFileHash() );
+		installedModFileNames.add( fileName );
+		installedModHashes.add( hash );
 	}
 
 	/**
@@ -58,7 +58,7 @@ public class ModdedDatInfo
 
 	public List<String> listInstalledModNames()
 	{
-		return Collections.unmodifiableList( installedModNames );
+		return Collections.unmodifiableList( installedModFileNames );
 	}
 
 	public List<String> listInstalledModHashes()
@@ -68,8 +68,8 @@ public class ModdedDatInfo
 
 	public List<Entry<String, String>> listInstalledMods()
 	{
-		return IntStream.range( 0, installedModNames.size() )
-			.mapToObj( i -> Util.entryOf( installedModNames.get( i ), installedModHashes.get( i ) ) )
+		return IntStream.range( 0, installedModFileNames.size() )
+			.mapToObj( i -> Util.entryOf( installedModFileNames.get( i ), installedModHashes.get( i ) ) )
 			.collect( Collectors.toList() );
 	}
 
@@ -83,11 +83,11 @@ public class ModdedDatInfo
 		Map<String, Object> v1 = new LinkedHashMap<>();
 		v1.put( "original_hash", originalHash );
 
-		List<Map<String, String>> installedMods = new ArrayList<>( installedModNames.size() );
-		for ( int i = 0; i < installedModNames.size(); i++ ) {
+		List<Map<String, String>> installedMods = new ArrayList<>( installedModFileNames.size() );
+		for ( int i = 0; i < installedModFileNames.size(); i++ ) {
 			Map<String, String> modInfo = new LinkedHashMap<>();
-			modInfo.put( "name", installedModNames.get( i ) );
-			modInfo.put( "hash", installedModHashes.get( i ) );
+			modInfo.put( "file_name", installedModFileNames.get( i ) );
+			modInfo.put( "file_hash", installedModHashes.get( i ) );
 			installedMods.add( modInfo );
 		}
 		v1.put( "installed_mods", installedMods );
@@ -115,8 +115,8 @@ public class ModdedDatInfo
 			LuaTable modsNode = v1Node.get( "installed_mods" ).checktable();
 			for ( LuaValue value : LuaLoader.values( modsNode ) ) {
 				LuaTable table = value.checktable();
-				mi.installedModNames.add( table.get( "name" ).checkjstring() );
-				mi.installedModHashes.add( table.get( "hash" ).checkjstring() );
+				mi.installedModFileNames.add( table.get( "file_name" ).checkjstring() );
+				mi.installedModHashes.add( table.get( "file_hash" ).checkjstring() );
 			}
 
 			return mi;

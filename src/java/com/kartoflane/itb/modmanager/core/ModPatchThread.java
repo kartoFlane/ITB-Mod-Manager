@@ -337,7 +337,10 @@ public class ModPatchThread extends Thread
 						zis.closeEntry();
 					}
 
-					datInfo.addModInfo( modInfos.get( i ) );
+					datInfo.addModInfo(
+						Util.stripExtension( modFile.getName() ),
+						modInfos.get( i ).getFileHash()
+					);
 				}
 				finally {
 					System.gc();
