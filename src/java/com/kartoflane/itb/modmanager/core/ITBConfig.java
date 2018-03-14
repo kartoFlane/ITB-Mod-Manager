@@ -26,16 +26,16 @@ public class ITBConfig extends Properties
 
 	// @formatter:off
 	// All keys the config can save
-	public static final String GAME_PATH =				"gamePath";
-	public static final String PROFILES_PATH =			"profilesPath";
-	public static final String ALLOW_ZIP =				"allowZip";
-	public static final String APP_UPDATE_INTERVAL =	"appUpdateInterval";
-	public static final String STEAM_DISTRO =			"steamDistro";
-	public static final String STEAM_EXE_PATH =			"steamExePath";
-	public static final String RUN_STEAM_ITB =			"runSteamITB";
-	public static final String NEVER_RUN_ITB =			"neverRunITB";
-	public static final String REMEMBER_GEOMETRY =		"rememberGeometry";
-	public static final String MANAGER_GEOMETRY =		"managerGeometry";
+	public static final String GAME_PATH =              "gamePath";
+	public static final String PROFILES_PATH =          "profilesPath";
+	public static final String ALLOW_ZIP =              "allowZip";
+	public static final String APP_UPDATE_INTERVAL =    "appUpdateInterval";
+	public static final String STEAM_DISTRO =           "steamDistro";
+	public static final String STEAM_EXE_PATH =         "steamExePath";
+	public static final String RUN_STEAM_ITB =          "runSteamITB";
+	public static final String NEVER_RUN_ITB =          "neverRunITB";
+	public static final String REMEMBER_GEOMETRY =      "rememberGeometry";
+	public static final String MANAGER_GEOMETRY =       "managerGeometry";
 	// @formatter:on
 
 	private File configFile = null;
@@ -85,17 +85,17 @@ public class ITBConfig extends Properties
 			Map<String, String> appFieldsMap = new LinkedHashMap<>();
 
 			// @formatter:off
-			userFieldsMap.put( GAME_PATH,			"The path to Into the Breach's game directory. If invalid, you'll be prompted." );
-			userFieldsMap.put( PROFILES_PATH,		"The path to the game's profiles directory." );
-			userFieldsMap.put( ALLOW_ZIP,			"Sets whether to treat .zip files as .itb files. Default: false." );
-			userFieldsMap.put( APP_UPDATE_INTERVAL,	"If a number greater than 0, check for newer app versions every N days." );
-			userFieldsMap.put( STEAM_DISTRO,		"If true, Into the Breach was installed via Steam. Stops the GUI asking for a path." );
-			userFieldsMap.put( STEAM_EXE_PATH,		"The path to Steam's executable, if Into the Breach was installed via Steam." );
-			userFieldsMap.put( RUN_STEAM_ITB,		"If true, the manager will use Steam to launch Into the Breach, if possible." );
-			userFieldsMap.put( NEVER_RUN_ITB,		"If true, there will be no offer to run the game after patching. Default: false." );
-			userFieldsMap.put( REMEMBER_GEOMETRY,	"If true, window geometry will be saved on exit and restored on startup." );
+			userFieldsMap.put( GAME_PATH,           "The path to Into the Breach's game directory. If invalid, you'll be prompted." );
+			userFieldsMap.put( PROFILES_PATH,       "The path to the game's profiles directory." );
+			userFieldsMap.put( ALLOW_ZIP,           "Sets whether to treat .zip files as .itb files. Default: false." );
+			userFieldsMap.put( APP_UPDATE_INTERVAL, "If a number greater than 0, check for newer app versions every N days." );
+			userFieldsMap.put( STEAM_DISTRO,        "If true, Into the Breach was installed via Steam. Stops the GUI asking for a path." );
+			userFieldsMap.put( STEAM_EXE_PATH,      "The path to Steam's executable, if Into the Breach was installed via Steam." );
+			userFieldsMap.put( RUN_STEAM_ITB,       "If true, the manager will use Steam to launch Into the Breach, if possible." );
+			userFieldsMap.put( NEVER_RUN_ITB,       "If true, there will be no offer to run the game after patching. Default: false." );
+			userFieldsMap.put( REMEMBER_GEOMETRY,   "If true, window geometry will be saved on exit and restored on startup." );
 
-			appFieldsMap.put( MANAGER_GEOMETRY,		"Last saved position/size/etc of the main window." );
+			appFieldsMap.put( MANAGER_GEOMETRY,     "Last saved position/size/etc of the main window." );
 			// @formatter:on
 
 			int fieldWidth = Stream.of( userFieldsMap, appFieldsMap )
