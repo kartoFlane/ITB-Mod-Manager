@@ -25,7 +25,6 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -94,7 +93,7 @@ public class FileOperationDialogController
 
 		stage.initOwner( owner );
 		stage.setResizable( false );
-		stage.initModality( Modality.APPLICATION_MODAL );
+		// stage.initModality( Modality.APPLICATION_MODAL );
 	}
 
 	protected void init()
