@@ -1,5 +1,8 @@
 package com.kartoflane.itb.modmanager.event;
 
+import java.util.function.BooleanSupplier;
+
+
 /**
  * Event class for an argumentless callback.
  * This class provides public {@link #broadcast()} and {@link #clearListeners()} methods.
@@ -44,5 +47,19 @@ public class EventCallback extends EventBase<Runnable> implements Event.Callback
 		catch ( RuntimeException e ) {
 			e.printStackTrace();
 		}
+	}
+
+	public Runnable addListenerSelfCleaning( Runnable listener, BooleanSupplier selfCleanPredicate )
+	{
+		final Runnable[] c = new Runnable[1];
+
+		c[0] = () -> {
+			safeNotify( listener );
+
+			if ( selfCleanPredicate == null || selfCleanPredicate.getAsBoolean() )
+				removeListener( c[0] );
+		};
+
+		return addListener( c[0] );
 	}
 }

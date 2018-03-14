@@ -1,6 +1,7 @@
 package com.kartoflane.itb.modmanager.event;
 
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 
 /**
@@ -55,5 +56,20 @@ public class EventSingle<T> extends EventBase<Consumer<T>> implements Event.Sing
 		catch ( RuntimeException e ) {
 			Thread.currentThread().getUncaughtExceptionHandler().uncaughtException( Thread.currentThread(), e );
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public Consumer<T> addListenerSelfCleaning( Consumer<T> listener, Predicate<T> selfCleanPredicate )
+	{
+		final Consumer<T>[] c = new Consumer[1];
+
+		c[0] = arg -> {
+			safeNotify( listener, arg );
+
+			if ( selfCleanPredicate == null || selfCleanPredicate.test( arg ) )
+				removeListener( c[0] );
+		};
+
+		return addListener( c[0] );
 	}
 }

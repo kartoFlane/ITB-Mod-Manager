@@ -1,6 +1,7 @@
 package com.kartoflane.itb.modmanager.event;
 
 import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
 
 
 /**
@@ -59,5 +60,20 @@ public class EventDouble<T, U> extends EventBase<BiConsumer<T, U>> implements Ev
 		catch ( RuntimeException e ) {
 			Thread.currentThread().getUncaughtExceptionHandler().uncaughtException( Thread.currentThread(), e );
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public BiConsumer<T, U> addListenerSelfCleaning( BiConsumer<T, U> listener, BiPredicate<T, U> selfCleanPredicate )
+	{
+		final BiConsumer<T, U>[] c = new BiConsumer[1];
+
+		c[0] = ( arg1, arg2 ) -> {
+			safeNotify( listener, arg1, arg2 );
+
+			if ( selfCleanPredicate == null || selfCleanPredicate.test( arg1, arg2 ) )
+				removeListener( c[0] );
+		};
+
+		return addListener( c[0] );
 	}
 }

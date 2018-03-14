@@ -1,7 +1,10 @@
 package com.kartoflane.itb.modmanager.event;
 
 import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 
 /**
@@ -60,14 +63,56 @@ public interface Event<L>
 
 	public static interface Callback extends Event<Runnable>
 	{
+		/**
+		 * Adds a self-cleaning listener to this event. This listener will trigger the listener
+		 * passed in argument, then check if it needs to unregister itself using the provided
+		 * predicate function.
+		 * 
+		 * @param listener
+		 *            the actual listener to trigger
+		 * @param selfCleanPredicate
+		 *            predicate returning true if this listener should unregister itself from
+		 *            the event. Can be null to unregister itself the next time the event is
+		 *            broadcast.
+		 * @return the self-cleaning listener
+		 */
+		public Runnable addListenerSelfCleaning( Runnable listener, BooleanSupplier selfCleanPredicate );
 	}
 
 	public static interface Single<T> extends Event<Consumer<T>>
 	{
+		/**
+		 * Adds a self-cleaning listener to this event. This listener will trigger the listener
+		 * passed in argument, then check if it needs to unregister itself using the provided
+		 * predicate function.
+		 * 
+		 * @param listener
+		 *            the actual listener to trigger
+		 * @param selfCleanPredicate
+		 *            predicate returning true if this listener should unregister itself from
+		 *            the event. Can be null to unregister itself the next time the event is
+		 *            broadcast.
+		 * @return the self-cleaning listener
+		 */
+		public Consumer<T> addListenerSelfCleaning( Consumer<T> listener, Predicate<T> selfCleanPredicate );
 	}
 
 	public static interface Double<T, U> extends Event<BiConsumer<T, U>>
 	{
+		/**
+		 * Adds a self-cleaning listener to this event. This listener will trigger the listener
+		 * passed in argument, then check if it needs to unregister itself using the provided
+		 * predicate function.
+		 * 
+		 * @param listener
+		 *            the actual listener to trigger
+		 * @param selfCleanPredicate
+		 *            predicate returning true if this listener should unregister itself from
+		 *            the event. Can be null to unregister itself the next time the event is
+		 *            broadcast.
+		 * @return the self-cleaning listener
+		 */
+		public BiConsumer<T, U> addListenerSelfCleaning( BiConsumer<T, U> listener, BiPredicate<T, U> selfCleanPredicate );
 	}
 
 	@SuppressWarnings("serial")
