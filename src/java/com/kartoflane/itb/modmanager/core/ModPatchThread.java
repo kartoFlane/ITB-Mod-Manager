@@ -46,8 +46,8 @@ import net.vhati.modmanager.core.ModUtilities;
 
 public class ModPatchThread extends Thread
 {
-	public static final String MODDED_INFO_INNER_PATH = "modded.info";
-	public static final String SCRIPTS_LIST_INNER_PATH = "scripts.lua";
+	public static final String MODDED_INFO_INNERPATH = "modded.info";
+	public static final String SCRIPTS_LIST_INNERPATH = "scripts.lua";
 
 	private static final Logger log = LogManager.getLogger();
 
@@ -187,7 +187,7 @@ public class ModPatchThread extends Thread
 			BackedUpFile resourceBud = backupManager.getBackupForFile( resourceDatFile );
 
 			patchingStatusChanged.broadcast( "Checking hashes..." );
-			boolean forceBackup = backupManager.checkDatHash( resourceBud, MODDED_INFO_INNER_PATH );
+			boolean forceBackup = backupManager.checkDatHash( resourceBud, MODDED_INFO_INNERPATH );
 
 			boolean resourceBakExisted = resourceBud.bakFile.exists();
 			boolean backupSuccessful = backupAndRestoreGameData( backedUpDats, forceBackup );
@@ -201,14 +201,14 @@ public class ModPatchThread extends Thread
 					InputStream is = Util.getInputStream( datInfo.toLuaString() );
 					AbstractPack pack = new FTLPack( resourceBud.bakFile, "r+" )
 				) {
-					if ( pack.contains( MODDED_INFO_INNER_PATH ) ) {
+					if ( pack.contains( MODDED_INFO_INNERPATH ) ) {
 						log.warn( "Game's resources already contained modded info. Game may not be in vanilla state." );
 						// Don't overwrite, since the hash we just computed is wrong.
 						// TODO: Display an alert warning the user, and ask if they want to continue patching anyway?
 						// will need a way to stop this thread and wait for the alert to be dismissed, tho.
 					}
 					else {
-						pack.add( MODDED_INFO_INNER_PATH, is );
+						pack.add( MODDED_INFO_INNERPATH, is );
 						pack.repack();
 					}
 				}
@@ -237,7 +237,7 @@ public class ModPatchThread extends Thread
 			packContainer.setPackFor( "img/", datPack );
 			packContainer.setPackFor( null, null );
 
-			ModdedDatInfo datInfo = ModdedDatInfo.build( datPack, MODDED_INFO_INNER_PATH );
+			ModdedDatInfo datInfo = ModdedDatInfo.build( datPack, MODDED_INFO_INNERPATH );
 
 			// Track modified innerPaths in case they're clobbered.
 			List<String> moddedItems = new ArrayList<>();
@@ -254,7 +254,7 @@ public class ModPatchThread extends Thread
 
 			List<String> knownRoots = packContainer.getRoots();
 
-			List<String> vanillaScriptsList = readScriptsList( scriptsPack, SCRIPTS_LIST_INNER_PATH );
+			List<String> vanillaScriptsList = readScriptsList( scriptsPack, SCRIPTS_LIST_INNERPATH );
 			List<String> moddedScriptsList = new ArrayList<String>();
 
 			// TODO: Insert modding API file here
@@ -348,9 +348,9 @@ public class ModPatchThread extends Thread
 			}
 
 			try ( InputStream is = Util.getInputStream( datInfo.toLuaString() ) ) {
-				if ( datPack.contains( MODDED_INFO_INNER_PATH ) )
-					datPack.remove( MODDED_INFO_INNER_PATH );
-				datPack.add( MODDED_INFO_INNER_PATH, is );
+				if ( datPack.contains( MODDED_INFO_INNERPATH ) )
+					datPack.remove( MODDED_INFO_INNERPATH );
+				datPack.add( MODDED_INFO_INNERPATH, is );
 			}
 
 			progMilestone += progModsMax;
@@ -358,9 +358,9 @@ public class ModPatchThread extends Thread
 
 			// Rebuild scripts.lua
 			try ( InputStream is = Util.getInputStream( rebuildScriptsList( vanillaScriptsList, moddedScriptsList ) ) ) {
-				if ( scriptsPack.contains( SCRIPTS_LIST_INNER_PATH ) )
-					scriptsPack.remove( SCRIPTS_LIST_INNER_PATH );
-				scriptsPack.add( SCRIPTS_LIST_INNER_PATH, is );
+				if ( scriptsPack.contains( SCRIPTS_LIST_INNERPATH ) )
+					scriptsPack.remove( SCRIPTS_LIST_INNERPATH );
+				scriptsPack.add( SCRIPTS_LIST_INNERPATH, is );
 				scriptsPack.repack();
 			}
 
