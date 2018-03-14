@@ -41,6 +41,12 @@ public class Util
 		return fileCal.compareTo( freshCal ) < 0;
 	}
 
+	public static String stripExtension( String filename )
+	{
+		int pos = filename.lastIndexOf( '.' );
+		return pos == -1 ? filename : filename.substring( 0, pos );
+	}
+
 	/**
 	 * Returns a ByteArrayInputStream over the specified string's bytes, with UTF-8 encoding.
 	 */

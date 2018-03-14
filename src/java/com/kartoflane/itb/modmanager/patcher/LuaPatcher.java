@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import com.kartoflane.itb.modmanager.util.Util;
+
 import net.vhati.ftldat.AbstractPack;
 
 
@@ -28,13 +30,7 @@ public class LuaPatcher implements ResourcePatcher
 
 	public String normalizeInnerPath( File modFile, String innerPath, String parentPath, String root, String fileName )
 	{
-		return String.join( "/", "mods", stripExtension( modFile.getName() ), fileName );
-	}
-
-	private String stripExtension( String filename )
-	{
-		int pos = filename.lastIndexOf( '.' );
-		return pos == -1 ? filename : filename.substring( 0, pos );
+		return String.join( "/", "mods", Util.stripExtension( modFile.getName() ), fileName );
 	}
 
 	public void patch( AbstractPack pack, String innerPath, InputStream is ) throws IOException
