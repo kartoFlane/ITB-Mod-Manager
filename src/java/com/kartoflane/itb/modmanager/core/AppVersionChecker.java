@@ -1,7 +1,6 @@
 package com.kartoflane.itb.modmanager.core;
 
 import java.io.File;
-import java.util.function.Consumer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,7 +21,7 @@ public class AppVersionChecker
 
 	public static final String APP_UPDATE_URL = "https://raw.github.com/kartoFlane/ITB-Mod-Manager/master/skels/skel_common/backup/auto_update.lua";
 
-	private final EventSingle<AutoUpdateInfo> updateAvailable = Event.create( null );
+	private final EventSingle<AutoUpdateInfo> updateAvailable = new EventSingle<>();
 
 	private final ITBConfig config;
 	private final ComparableVersion appVersion;
@@ -38,7 +37,7 @@ public class AppVersionChecker
 		this.appUpdateETagFile = appUpdateETagFile;
 	}
 
-	public Event<Consumer<AutoUpdateInfo>> updateAvailableEvent()
+	public Event.Single<AutoUpdateInfo> updateAvailableEvent()
 	{
 		return updateAvailable;
 	}

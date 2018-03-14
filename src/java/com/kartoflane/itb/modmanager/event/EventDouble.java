@@ -7,7 +7,7 @@ import java.util.function.BiConsumer;
  * Event class for a callback with two arguments.
  * This class provides public {@link #broadcast()} and {@link #clearListeners()} methods.
  * It is intended to be visible only in the class that 'owns' the event -- listeners
- * interested in the event should only be able to see the base {@link Event} class, which
+ * interested in the event should only be able to see the base {@link EventBase} class, which
  * exposes methods for listener de/registration.
  * 
  * @param <T>
@@ -15,7 +15,7 @@ import java.util.function.BiConsumer;
  * @param <U>
  *            type of the second argument received by listeners of this event
  */
-public class EventDouble<T, U> extends Event<BiConsumer<T, U>>
+public class EventDouble<T, U> extends EventBase<BiConsumer<T, U>> implements Event.Double<T, U>
 {
 	/**
 	 * Clears the list of listeners of this event, so no dangling references are left over.

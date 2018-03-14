@@ -4,10 +4,10 @@ package com.kartoflane.itb.modmanager.event;
  * Event class for an argumentless callback.
  * This class provides public {@link #broadcast()} and {@link #clearListeners()} methods.
  * It is intended to be visible only in the class that 'owns' the event -- listeners
- * interested in the event should only be able to see the base {@link Event} class, which
+ * interested in the event should only be able to see the base {@link EventBase} class, which
  * exposes methods for listener de/registration.
  */
-public class EventCallback extends Event<Runnable>
+public class EventCallback extends EventBase<Runnable> implements Event.Callback
 {
 	/**
 	 * Clears the list of listeners of this event, so no dangling references are left over.

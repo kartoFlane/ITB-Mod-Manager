@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,10 +48,10 @@ public class ModPatchThread extends Thread
 {
 	private static final Logger log = LogManager.getLogger();
 
-	private final EventDouble<Integer, Integer> patchingProgressChanged = Event.create( Integer.class, Integer.class );
-	private final EventSingle<String> patchingStatusChanged = Event.create( String.class );
-	private final EventSingle<File> patchingModStarted = Event.create( File.class );
-	private final EventDouble<Boolean, Exception> patchingEnded = Event.create( Boolean.class, Exception.class );
+	private final EventDouble<Integer, Integer> patchingProgressChanged = new EventDouble<>();
+	private final EventSingle<String> patchingStatusChanged = new EventSingle<>();
+	private final EventSingle<File> patchingModStarted = new EventSingle<>();
+	private final EventDouble<Boolean, Exception> patchingEnded = new EventDouble<>();
 
 
 	// Other threads can check or set this.
@@ -87,22 +86,22 @@ public class ModPatchThread extends Thread
 		this.gameDir = gameDir;
 	}
 
-	public Event<BiConsumer<Integer, Integer>> patchingProgressChangedEvent()
+	public Event.Double<Integer, Integer> patchingProgressChangedEvent()
 	{
 		return patchingProgressChanged;
 	}
 
-	public Event<Consumer<String>> patchingStatusChangedEvent()
+	public Event.Single<String> patchingStatusChangedEvent()
 	{
 		return patchingStatusChanged;
 	}
 
-	public Event<Consumer<File>> patchingModStartedEvent()
+	public Event.Single<File> patchingModStartedEvent()
 	{
 		return patchingModStarted;
 	}
 
-	public Event<BiConsumer<Boolean, Exception>> patchingEndedEvent()
+	public Event.Double<Boolean, Exception> patchingEndedEvent()
 	{
 		return patchingEnded;
 	}

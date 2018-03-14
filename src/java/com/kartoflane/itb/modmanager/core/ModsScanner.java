@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Consumer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -47,8 +46,8 @@ public class ModsScanner
 {
 	private static final Logger log = LogManager.getLogger();
 
-	private final EventSingle<Boolean> scanningStateChanged = Event.create( null );
-	private final EventSingle<ListState<ModFileInfo>> modsTableStateAmended = Event.create( null );
+	private final EventSingle<Boolean> scanningStateChanged = new EventSingle<>();
+	private final EventSingle<ListState<ModFileInfo>> modsTableStateAmended = new EventSingle<>();
 
 	private final ITBConfig config;
 	private final File modsDir;
@@ -77,12 +76,12 @@ public class ModsScanner
 		this.modsMetadataFile = modMetadataFile;
 	}
 
-	public Event<Consumer<Boolean>> scanningStateChangedEvent()
+	public Event.Single<Boolean> scanningStateChangedEvent()
 	{
 		return scanningStateChanged;
 	}
 
-	public Event<Consumer<ListState<ModFileInfo>>> modsTableStateAmendedEvent()
+	public Event.Single<ListState<ModFileInfo>> modsTableStateAmendedEvent()
 	{
 		return modsTableStateAmended;
 	}

@@ -2,8 +2,6 @@ package com.kartoflane.itb.modmanager.ui;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import com.kartoflane.itb.modmanager.event.Event;
@@ -42,8 +40,8 @@ import net.vhati.modmanager.ui.table.ListState;
  */
 public class ModListController
 {
-	private final EventSingle<ModFileInfo> modSelected = Event.create( null );
-	private final EventDouble<ModFileInfo, Boolean> modSelectionToggled = Event.create( null, null );
+	private final EventSingle<ModFileInfo> modSelected = new EventSingle<>();
+	private final EventDouble<ModFileInfo, Boolean> modSelectionToggled = new EventDouble<>();
 
 	private final ChangeListener<Boolean> checkboxSelectionListener;
 
@@ -60,7 +58,7 @@ public class ModListController
 	/**
 	 * Sent when a mod is selected (focused, highlighted) in the tree view.
 	 */
-	public Event<Consumer<ModFileInfo>> modSelectedEvent()
+	public Event.Single<ModFileInfo> modSelectedEvent()
 	{
 		return modSelected;
 	}
@@ -68,7 +66,7 @@ public class ModListController
 	/**
 	 * Sent when a mod's checkbox is toggled, meaning that the mod is selected for patching.
 	 */
-	public Event<BiConsumer<ModFileInfo, Boolean>> modSelectionToggledEvent()
+	public Event.Double<ModFileInfo, Boolean> modSelectionToggledEvent()
 	{
 		return modSelectionToggled;
 	}

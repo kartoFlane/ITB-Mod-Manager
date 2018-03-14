@@ -7,13 +7,13 @@ import java.util.function.Consumer;
  * Event class for a callback with a single argument.
  * This class provides public {@link #broadcast()} and {@link #clearListeners()} methods.
  * It is intended to be visible only in the class that 'owns' the event -- listeners
- * interested in the event should only be able to see the base {@link Event} class, which
+ * interested in the event should only be able to see the base {@link EventBase} class, which
  * exposes methods for listener de/registration.
  * 
  * @param <T>
  *            type of the argument received by listeners of this event
  */
-public class EventSingle<T> extends Event<Consumer<T>>
+public class EventSingle<T> extends EventBase<Consumer<T>> implements Event.Single<T>
 {
 	/**
 	 * Clears the list of listeners of this event, so no dangling references are left over.

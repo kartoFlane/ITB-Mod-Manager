@@ -1,13 +1,12 @@
 package com.kartoflane.itb.modmanager.event;
 
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 
 /**
- * This class is meant to emulate C#-like events in syntax.
+ * This class is meant to emulate C#-like events in syntax, and streamline the implementation of
+ * event-driven communication.
  * 
  * 
  * <h1>Thread Safety</h1>
@@ -52,47 +51,24 @@ import java.util.function.Consumer;
  * @param <L>
  *            the type of listener that can be registered to this event
  */
-public abstract class Event<L>
+public interface Event<L>
 {
-	protected Set<L> listeners = null;
+	public L addListener( L listener );
+
+	public void removeListener( L listener ) throws ListenerException;
 
 
-	public static EventCallback create()
+	public static interface Callback extends Event<Runnable>
 	{
-		return new EventCallback();
 	}
 
-	/** Arguments of this method are ignored; you can safely pass null into this method. */
-	public static <T> EventSingle<T> create( Class<T> c )
+	public static interface Single<T> extends Event<Consumer<T>>
 	{
-		return new EventSingle<>();
 	}
 
-	/** Arguments of this method are ignored; you can safely pass null into this method. */
-	public static <T, U> EventDouble<T, U> create( Class<T> c1, Class<U> c2 )
+	public static interface Double<T, U> extends Event<BiConsumer<T, U>>
 	{
-		return new EventDouble<>();
 	}
-
-	public L addListener( L listener )
-	{
-		Objects.requireNonNull( listener );
-		if ( listeners == null )
-			listeners = new CopyOnWriteArraySet<>();
-		listeners.add( listener );
-		return listener;
-	}
-
-	public void removeListener( L listener ) throws ListenerException
-	{
-		Objects.requireNonNull( listener );
-		if ( listeners == null || listeners.size() == 0 )
-			return;
-		if ( !listeners.remove( listener ) ) {
-			throw new ListenerException();
-		}
-	}
-
 
 	@SuppressWarnings("serial")
 	public static class ListenerException extends RuntimeException

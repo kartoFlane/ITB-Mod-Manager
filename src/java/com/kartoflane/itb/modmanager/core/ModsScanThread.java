@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,9 +32,9 @@ public class ModsScanThread extends Thread
 {
 	private static final Logger log = LogManager.getLogger();
 
-	private final EventDouble<File, String> hashCalculated = Event.create( null, null );
-	private final EventSingle<ModDB> localModDBUpdated = Event.create( null );
-	private final EventCallback scanEnded = Event.create();
+	private final EventDouble<File, String> hashCalculated = new EventDouble<>();
+	private final EventSingle<ModDB> localModDBUpdated = new EventSingle<>();
+	private final EventCallback scanEnded = new EventCallback();
 
 	private List<File> fileList = new ArrayList<File>();
 	private ModDB newDB;
@@ -49,17 +47,17 @@ public class ModsScanThread extends Thread
 		this.newDB = new ModDB( knownDB );
 	}
 
-	public Event<BiConsumer<File, String>> hashCalculatedEvent()
+	public Event.Double<File, String> hashCalculatedEvent()
 	{
 		return hashCalculated;
 	}
 
-	public Event<Consumer<ModDB>> localModDBUpdatedEvent()
+	public Event.Single<ModDB> localModDBUpdatedEvent()
 	{
 		return localModDBUpdated;
 	}
 
-	public Event<Runnable> scanEndedEvent()
+	public Event.Callback scanEndedEvent()
 	{
 		return scanEnded;
 	}
