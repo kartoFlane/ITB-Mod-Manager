@@ -102,6 +102,11 @@ public class ITBModManager extends Application
 			log.error( "Error while reading configuration file.", e );
 		}
 
+		if ( !backupDir.exists() )
+			backupDir.mkdirs();
+		if ( !modsDir.exists() )
+			modsDir.mkdirs();
+
 		Path gameDirPath = findGamePath( config );
 
 		configSetup( config );

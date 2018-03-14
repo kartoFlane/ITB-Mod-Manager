@@ -6,7 +6,6 @@ import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
@@ -247,7 +246,9 @@ public class ModsScanner
 		List<String> fileNames = Collections.emptyList();
 
 		try {
-			fileNames = Files.readAllLines( modsTableStateFile.toPath(), Charset.forName( "UTF-8" ) );
+			if ( modsTableStateFile.exists() ) {
+				fileNames = Files.readAllLines( modsTableStateFile.toPath(), StandardCharsets.UTF_8 );
+			}
 		}
 		catch ( IOException e ) {
 			log.error( String.format( "Error reading \"%s\"", modsTableStateFile.getName() ), e );
