@@ -5,8 +5,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -94,12 +100,20 @@ public class ManagerWindow
 		this.menuController = new MenuController( config, modsScanner, backupManager, modListController );
 
 		createGUI();
+
+		if ( config.getPropertyAsBoolean( ITBConfig.REMEMBER_GEOMETRY, true ) ) {
+			setGeometryFromConfig();
+		}
 	}
 
 	public void show()
 	{
 		stage.show();
 		showUsageInformation();
+
+		if ( config.getPropertyAsBoolean( ITBConfig.REMEMBER_GEOMETRY, true ) ) {
+			setGeometryFromConfig();
+		}
 	}
 
 	public void showUsageInformation()
@@ -202,6 +216,46 @@ public class ManagerWindow
 			.forEach( r -> r.prefWidthProperty().unbind() );
 
 		contentPaneRight.getChildren().clear();
+	}
+
+	private void setGeometryFromConfig()
+	{
+		String geometry = config.getProperty( ITBConfig.MANAGER_GEOMETRY );
+
+		if ( geometry != null ) {
+			double[] xywh = new double[4];
+			double dividerLoc = -1;
+
+			Matcher m = Pattern.compile( "([^;,]+),(\\d+\\.?\\d+)" ).matcher( geometry );
+
+			try {
+				while ( m.find() ) {
+					if ( m.group( 1 ).equals( "x" ) )
+						xywh[0] = Integer.parseInt( m.group( 2 ) );
+					else if ( m.group( 1 ).equals( "y" ) )
+						xywh[1] = Integer.parseInt( m.group( 2 ) );
+					else if ( m.group( 1 ).equals( "w" ) )
+						xywh[2] = Integer.parseInt( m.group( 2 ) );
+					else if ( m.group( 1 ).equals( "h" ) )
+						xywh[3] = Integer.parseInt( m.group( 2 ) );
+					else if ( m.group( 1 ).equals( "divider" ) )
+						dividerLoc = NumberFormat.getInstance( Locale.ENGLISH ).parse( m.group( 2 ) ).doubleValue();
+				}
+
+				boolean badGeometry = Arrays.stream( xywh ).anyMatch( d -> d <= 0 );
+
+				if ( !badGeometry && dividerLoc > 0 ) {
+					stage.setX( xywh[0] );
+					stage.setY( xywh[1] );
+					stage.setWidth( xywh[2] );
+					stage.setHeight( xywh[3] );
+					splitPane.setDividerPosition( 0, dividerLoc );
+				}
+			}
+			catch ( ParseException e ) {
+				log.error( "Error parsing manager geometry: ", e );
+			}
+		}
 	}
 
 	// --------------------------------------------------------------------------------
@@ -330,6 +384,20 @@ public class ManagerWindow
 	private void onCloseRequest( WindowEvent e )
 	{
 		log.info( "Exiting." );
+
+		if ( config.getPropertyAsBoolean( ITBConfig.REMEMBER_GEOMETRY, true ) ) {
+			if ( !stage.isMaximized() && !stage.isIconified() && !stage.isFullScreen() ) {
+				String geometry = String.format(
+					Locale.ENGLISH,
+					"x,%.0f;y,%.0f;w,%.0f;h,%.0f;divider,%.3f",
+					stage.getX(), stage.getY(),
+					stage.getWidth(), stage.getHeight(),
+					splitPane.getDividerPositions()[0]
+				);
+
+				config.setProperty( ITBConfig.MANAGER_GEOMETRY, geometry );
+			}
+		}
 
 		try {
 			config.write();
