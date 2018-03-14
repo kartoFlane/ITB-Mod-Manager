@@ -6,7 +6,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import com.kartoflane.itb.modmanager.core.ModFileInfoView;
 import com.kartoflane.itb.modmanager.event.Event;
 import com.kartoflane.itb.modmanager.event.EventDouble;
 import com.kartoflane.itb.modmanager.event.EventSingle;
@@ -41,7 +40,7 @@ import net.vhati.modmanager.ui.table.ListState;
 /**
  * Controls interaction with the mod list.
  */
-public class ModListController implements ModFileInfoView
+public class ModListController
 {
 	private final EventSingle<ModFileInfo> modSelected = Event.create( null );
 	private final EventDouble<ModFileInfo, Boolean> modSelectionToggled = Event.create( null, null );
@@ -97,7 +96,6 @@ public class ModListController implements ModFileInfoView
 		return treeView;
 	}
 
-	@Override
 	public ListState<ModFileInfo> getCurrentModsTableState()
 	{
 		ListState<ModFileInfo> tableState = new ListState<ModFileInfo>();
@@ -109,7 +107,6 @@ public class ModListController implements ModFileInfoView
 		return tableState;
 	}
 
-	@Override
 	public void updateModel( ListState<ModFileInfo> tableState )
 	{
 		clearModel();
@@ -122,7 +119,6 @@ public class ModListController implements ModFileInfoView
 		}
 	}
 
-	@Override
 	public List<ModFileInfo> getSelectedMods()
 	{
 		return treeView.getRoot().getChildren().stream()

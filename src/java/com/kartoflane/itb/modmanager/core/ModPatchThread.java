@@ -538,6 +538,7 @@ public class ModPatchThread extends Thread
 	}
 
 
+	@SuppressWarnings("serial")
 	public static class ReinstallRequiredException extends Exception
 	{
 	}
