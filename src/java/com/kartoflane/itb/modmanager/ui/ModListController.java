@@ -1,8 +1,10 @@
 package com.kartoflane.itb.modmanager.ui;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.kartoflane.itb.modmanager.event.Event;
 import com.kartoflane.itb.modmanager.event.EventDouble;
@@ -126,6 +128,35 @@ public class ModListController
 			.collect( Collectors.toList() );
 	}
 
+	/**
+	 * Selects all items in the current list which are contained in the specified
+	 * list of selected mods.
+	 * 
+	 * @param list
+	 *            list of entries to select. Can be parametrized with either File or
+	 *            ModFileInfo.
+	 */
+	public <T> void selectMods( List<T> list, Class<T> type )
+	{
+		if ( list.isEmpty() )
+			return;
+
+		Stream<CheckBoxTreeItem<ModFileInfo>> stream = treeView.getRoot().getChildren().stream()
+			.map( item -> (CheckBoxTreeItem<ModFileInfo>)item );
+
+		if ( File.class.equals( type ) ) {
+			// Strict
+			stream.forEach( item -> item.setSelected( list.contains( item.getValue().getFile() ) ) );
+		}
+		else if ( ModFileInfo.class.equals( type ) ) {
+			// Sloppy
+			stream.forEach( item -> item.setSelected( list.contains( item.getValue() ) ) );
+		}
+		else {
+			throw new IllegalArgumentException( "Implementation error: no case defined for class " + type );
+		}
+	}
+
 	public void toggleAllItemSelection()
 	{
 		List<TreeItem<ModFileInfo>> rootChildren = treeView.getRoot().getChildren();
@@ -138,7 +169,6 @@ public class ModListController
 			.map( item -> (CheckBoxTreeItem<ModFileInfo>)item )
 			.forEach( item -> item.setSelected( anyDeselected ) );
 	}
-
 
 	private void clearModel()
 	{

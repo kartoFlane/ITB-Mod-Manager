@@ -10,6 +10,7 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -265,6 +266,67 @@ public class ManagerWindow
 	public void onUpdateAvailable( AutoUpdateInfo aui )
 	{
 		menuController.setAutoUpdateInfo( aui );
+	}
+
+	public void onInstalledModsLoaded( List<Entry<String, String>> listInstalledMods )
+	{
+		boolean strict = false;
+
+		if ( strict ) {
+			log.trace( "Loading list of installed mods using strict matching." );
+			// Very reliable, always selects the correct mods, but slow to load.
+			// Realistically not very useful, as the user will have made his selection
+			// by the time this is ready.
+			selectInstalledModsStrict(
+				listInstalledMods.stream()
+					.map( entry -> entry.getValue() )
+					.collect( Collectors.toList() )
+			);
+		}
+		else {
+			log.trace( "Loading list of installed mods using sloppy matching." );
+			// Fast, but might fail for some mods, or incorretly select some mods.
+			// But should be fine most of the time.
+			selectInstalledModsSloppy(
+				listInstalledMods.stream()
+					.map( entry -> entry.getKey() )
+					.collect( Collectors.toList() )
+			);
+		}
+	}
+
+	private void selectInstalledModsStrict( List<String> hashes )
+	{
+		modsScanner.scanningStateChangedEvent().addListenerSelfCleaning(
+			scanning -> {
+				Platform.runLater(
+					() -> modListController.selectMods(
+						hashes.stream()
+							.map( hash -> modsScanner.getFileForHash( hash ) )
+							.filter( file -> file != null )
+							.collect( Collectors.toList() ),
+						File.class
+					)
+				);
+			},
+			scanning -> !scanning
+		);
+	}
+
+	private void selectInstalledModsSloppy( List<String> fileNames )
+	{
+		modsScanner.modsTableStateAmendedEvent().addListenerSelfCleaning(
+			listState -> {
+				Platform.runLater(
+					() -> modListController.selectMods(
+						modListController.getCurrentModsTableState().getItems().stream()
+							.filter( modFileInfo -> fileNames.contains( modFileInfo.getName() ) )
+							.collect( Collectors.toList() ),
+						ModFileInfo.class
+					)
+				);
+			}, null
+		);
 	}
 
 	@FXML

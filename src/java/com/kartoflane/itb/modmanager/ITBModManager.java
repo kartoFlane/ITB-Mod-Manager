@@ -15,6 +15,8 @@ import com.kartoflane.itb.modmanager.cli.ITBModManagerCLI;
 import com.kartoflane.itb.modmanager.core.AppVersionChecker;
 import com.kartoflane.itb.modmanager.core.BackupManager;
 import com.kartoflane.itb.modmanager.core.ITBConfig;
+import com.kartoflane.itb.modmanager.core.ModPatchThread;
+import com.kartoflane.itb.modmanager.core.ModdedDatInfo;
 import com.kartoflane.itb.modmanager.core.ModsScanner;
 import com.kartoflane.itb.modmanager.ui.ManagerWindow;
 import com.kartoflane.itb.modmanager.util.ITBUtilities;
@@ -157,6 +159,16 @@ public class ITBModManager extends Application
 				() -> {
 					try {
 						modsScanner.loadCachedModMetadata();
+
+						try {
+							File dat = new File( resourcesDir, "resource.dat" );
+							ModdedDatInfo datInfo = ModdedDatInfo.build( dat, ModPatchThread.MODDED_INFO_INNERPATH );
+							managerWindow.onInstalledModsLoaded( datInfo.listInstalledMods() );
+						}
+						catch ( IOException e ) {
+							// resource.dat did not contain modded.info, *shrug*
+						}
+
 						appVersionChecker.checkUpdateInfo();
 					}
 					catch ( Exception e ) {

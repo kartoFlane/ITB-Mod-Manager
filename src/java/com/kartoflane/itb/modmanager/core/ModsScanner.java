@@ -196,6 +196,25 @@ public class ModsScanner
 	}
 
 	/**
+	 * Returns a File instance that matches the specified hash.
+	 * Returns null if no matching file could be found.
+	 * 
+	 * Important: this method simply iterates over the ModsScanner's
+	 * internal Map of files-to-hashes, which is built on a separate
+	 * thread when the mod manager is started. Depending on the number
+	 * and size of mod files, this Map may not hold all the values
+	 * yet by the time you want to call this method.
+	 */
+	public File getFileForHash( String hash )
+	{
+		return modFileHashes.entrySet().stream()
+			.filter( entry -> entry.getValue().equals( hash ) )
+			.map( entry -> entry.getKey() )
+			.findFirst()
+			.orElse( null );
+	}
+
+	/**
 	 * Clears and syncs the mods list with mods/ dir, then starts a new hash thread.
 	 */
 	public void rescanMods( ListState<ModFileInfo> tableState )
