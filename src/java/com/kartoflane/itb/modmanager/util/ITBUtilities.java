@@ -185,7 +185,7 @@ public class ITBUtilities
 			for ( Path candidateDir : new Path[] { gameDir } ) {
 				if ( candidateDir == null ) continue;
 
-				Path exeFile = candidateDir.resolve( "FTLGame.exe" );
+				Path exeFile = candidateDir.resolve( "Breach.exe" );
 				if ( Files.exists( exeFile ) ) {
 					result = exeFile;
 					break;
@@ -196,7 +196,7 @@ public class ITBUtilities
 			for ( Path candidateDir : new Path[] { gameDir } ) {
 				if ( candidateDir == null ) continue;
 
-				Path exeFile = candidateDir.resolve( "FTL" );
+				Path exeFile = candidateDir.resolve( "Breach" );
 				if ( Files.exists( exeFile ) ) {
 					result = exeFile;
 					break;
