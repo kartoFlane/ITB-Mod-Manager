@@ -110,6 +110,10 @@ public class MenuController
 		mntmUpdate.setOnAction( this::onUpdateAvailableClicked );
 		menuBar.getMenus().add( mntmUpdate );
 
+		if ( !config.getPropertyAsBoolean( ITBConfig.STEAM_DISTRO, false ) ) {
+			mntmVerifyIntegrity.setDisable( true );
+		}
+
 		// Temp while those buttons' functions are not implemented yet
 		mntmPreferences.setDisable( true );
 	}
