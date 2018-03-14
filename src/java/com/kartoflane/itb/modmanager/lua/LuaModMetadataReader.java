@@ -33,12 +33,11 @@ public class LuaModMetadataReader
 	{
 		ModInfo modInfo = null;
 
-		InputStream fis = null;
-		ZipInputStream zis = null;
 		Exception exception = null;
-		try {
-			fis = new FileInputStream( modFile );
-			zis = new ZipInputStream( new BufferedInputStream( fis ) );
+		try (
+			InputStream is = new FileInputStream( modFile );
+			ZipInputStream zis = new ZipInputStream( new BufferedInputStream( is ) )
+		) {
 			ZipEntry item;
 			while ( ( item = zis.getNextEntry() ) != null ) {
 				if ( item.isDirectory() ) {
@@ -47,7 +46,7 @@ public class LuaModMetadataReader
 				}
 
 				String innerPath = item.getName();
-				innerPath = innerPath.replace( '\\', '/' );  // Non-standard zips.
+				innerPath = innerPath.replace( '\\', '/' ); // Non-standard zips.
 
 				if ( innerPath.equals( METADATA_INNERPATH ) ) {
 					String metadataText = ModUtilities.decodeText( zis, modFile.getName() + ":" + METADATA_INNERPATH ).text;
@@ -66,19 +65,7 @@ public class LuaModMetadataReader
 		catch ( IOException e ) {
 			exception = e;
 		}
-		finally {
-			try {
-				if ( zis != null ) zis.close();
-			}
-			catch ( IOException e ) {
-			}
 
-			try {
-				if ( fis != null ) fis.close();
-			}
-			catch ( IOException e ) {
-			}
-		}
 		if ( exception != null ) {
 			log.error(
 				String.format(
