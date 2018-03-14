@@ -94,7 +94,9 @@ public class ITBModManager extends Application
 	{
 		config = new ITBConfig( configFile );
 		try {
-			config.read();
+			if ( configFile.exists() ) {
+				config.read();
+			}
 		}
 		catch ( IOException e ) {
 			log.error( "Error while reading configuration file.", e );
