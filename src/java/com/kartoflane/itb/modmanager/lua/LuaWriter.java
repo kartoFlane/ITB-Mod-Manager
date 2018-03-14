@@ -129,9 +129,14 @@ public class LuaWriter
 
 	private static StringBuilder appendString( StringBuilder buf, String string, int indent )
 	{
-		// Normalize and escape newlines
-		string = string.replaceAll( "\r?\n", "\\\\n" );
-		return buf.append( '\"' ).append( string ).append( '\"' );
+		if ( string.indexOf( '\n' ) == -1 ) {
+			// If the string contains no linebreaks, use double quotes.
+			return buf.append( '\"' ).append( string ).append( '\"' );
+		}
+		else {
+			// If the string has linebreaks, use double brackets -- multiline string.
+			return buf.append( "[[" ).append( string ).append( "]]" );
+		}
 	}
 
 	private static StringBuilder appendIndent( StringBuilder buf, int indentLevel )
