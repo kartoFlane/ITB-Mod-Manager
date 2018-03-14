@@ -85,7 +85,8 @@ public class ManagerWindow
 
 	public ManagerWindow(
 		ITBConfig config,
-		ModsScanner modsScanner, BackupManager backupManager,
+		ModsScanner modsScanner,
+		BackupManager backupManager,
 		File gameDir
 	) throws IOException
 	{

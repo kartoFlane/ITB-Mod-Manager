@@ -151,7 +151,7 @@ public class BackupManager
 				// If they do match, then we don't need to do anything.
 				ModdedDatInfo datInfo = ModdedDatInfo.build( datPack, infoFileInnerPath );
 
-				if ( !datInfo.originalHash.equals( bakInfo.originalHash ) ) {
+				if ( !datInfo.getOriginalHash().equals( bakInfo.getOriginalHash() ) ) {
 					log.warn( "Game's dat contained modded info, but hashes didn't match - reinstall required." );
 
 					Platform.runLater(
@@ -181,10 +181,9 @@ public class BackupManager
 				// recompute the hash next time.
 				String computedDatHash = PackUtilities.calcFileMD5( resourceBud.srcFile );
 
-				if ( computedDatHash.equals( bakInfo.originalHash ) ) {
+				if ( computedDatHash.equals( bakInfo.getOriginalHash() ) ) {
 					log.info( "Game's dat did not contain modded info, but backed up hash matches - inserting modded info file." );
-					ModdedDatInfo datInfo = new ModdedDatInfo();
-					datInfo.originalHash = computedDatHash;
+					ModdedDatInfo datInfo = new ModdedDatInfo( computedDatHash );
 
 					try ( InputStream is = Util.getInputStream( datInfo.toLuaString() ) ) {
 						datPack.add( infoFileInnerPath, is );

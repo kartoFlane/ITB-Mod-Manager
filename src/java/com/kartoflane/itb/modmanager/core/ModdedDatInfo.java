@@ -4,32 +4,73 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 
 import com.kartoflane.itb.modmanager.lua.LuaLoader;
 import com.kartoflane.itb.modmanager.lua.LuaWriter;
+import com.kartoflane.itb.modmanager.util.Util;
 
 import net.vhati.ftldat.AbstractPack;
 import net.vhati.ftldat.FTLPack;
+import net.vhati.modmanager.core.ModInfo;
 
 
 public class ModdedDatInfo
 {
-	/** Hash of the original, unmodded .dat */
-	public String originalHash;
-	public List<String> installedModsNames;
-	public List<String> installedModsHashes;
+	private String originalHash;
+	private List<String> installedModNames;
+	private List<String> installedModHashes;
 
 
-	public ModdedDatInfo()
+	private ModdedDatInfo()
 	{
-		installedModsNames = new ArrayList<>();
-		installedModsHashes = new ArrayList<>();
+		installedModNames = new ArrayList<>();
+		installedModHashes = new ArrayList<>();
+	}
+
+	public ModdedDatInfo( String hash )
+	{
+		originalHash = hash;
+	}
+
+	public void addModInfo( ModInfo modInfo )
+	{
+		installedModNames.add( modInfo.getTitle() );
+		installedModHashes.add( modInfo.getFileHash() );
+	}
+
+	/**
+	 * Returns hash of the original, unmodded .dat
+	 */
+	public String getOriginalHash()
+	{
+		return originalHash;
+	}
+
+	public List<String> listInstalledModNames()
+	{
+		return Collections.unmodifiableList( installedModNames );
+	}
+
+	public List<String> listInstalledModHashes()
+	{
+		return Collections.unmodifiableList( installedModHashes );
+	}
+
+	public List<Entry<String, String>> listInstalledMods()
+	{
+		return IntStream.range( 0, installedModNames.size() )
+			.mapToObj( i -> Util.entryOf( installedModNames.get( i ), installedModHashes.get( i ) ) )
+			.collect( Collectors.toList() );
 	}
 
 	/**
@@ -42,11 +83,11 @@ public class ModdedDatInfo
 		Map<String, Object> v1 = new LinkedHashMap<>();
 		v1.put( "original_hash", originalHash );
 
-		List<Map<String, String>> installedMods = new ArrayList<>( installedModsNames.size() );
-		for ( int i = 0; i < installedModsNames.size(); i++ ) {
+		List<Map<String, String>> installedMods = new ArrayList<>( installedModNames.size() );
+		for ( int i = 0; i < installedModNames.size(); i++ ) {
 			Map<String, String> modInfo = new LinkedHashMap<>();
-			modInfo.put( "name", installedModsNames.get( i ) );
-			modInfo.put( "hash", installedModsHashes.get( i ) );
+			modInfo.put( "name", installedModNames.get( i ) );
+			modInfo.put( "hash", installedModHashes.get( i ) );
 			installedMods.add( modInfo );
 		}
 		v1.put( "installed_mods", installedMods );
@@ -56,6 +97,9 @@ public class ModdedDatInfo
 		return LuaWriter.toLuaString( root );
 	}
 
+	/**
+	 * Builds an instance of {@link #ModdedDatInfo} from the modded-info file from the specified pack.
+	 */
 	public static ModdedDatInfo build( AbstractPack datPack, String infoFileInnerPath ) throws IOException
 	{
 		try ( InputStream is = datPack.getInputStream( infoFileInnerPath ) ) {
@@ -71,18 +115,21 @@ public class ModdedDatInfo
 			LuaTable modsNode = v1Node.get( "installed_mods" ).checktable();
 			for ( LuaValue value : LuaLoader.values( modsNode ) ) {
 				LuaTable table = value.checktable();
-				mi.installedModsNames.add( table.get( "name" ).checkjstring() );
-				mi.installedModsHashes.add( table.get( "hash" ).checkjstring() );
+				mi.installedModNames.add( table.get( "name" ).checkjstring() );
+				mi.installedModHashes.add( table.get( "hash" ).checkjstring() );
 			}
 
 			return mi;
 		}
 	}
 
+	/**
+	 * Builds an instance of {@link #ModdedDatInfo} from the modded-info file from the specified .dat archive.
+	 */
 	public static ModdedDatInfo build( File datFile, String infoFileInnerPath ) throws IOException
 	{
 		try ( AbstractPack datPack = new FTLPack( datFile, "r" ) ) {
-			return build( datFile, infoFileInnerPath );
+			return build( datPack, infoFileInnerPath );
 		}
 	}
 }
