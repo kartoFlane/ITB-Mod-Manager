@@ -160,13 +160,15 @@ public class ITBModManager extends Application
 					try {
 						modsScanner.loadCachedModMetadata();
 
-						try {
-							File dat = new File( resourcesDir, "resource.dat" );
-							ModdedDatInfo datInfo = ModdedDatInfo.build( dat, ModPatchThread.MODDED_INFO_INNERPATH );
-							managerWindow.onInstalledModsLoaded( datInfo.listInstalledMods() );
-						}
-						catch ( IOException e ) {
-							// resource.dat did not contain modded.info, *shrug*
+						if ( config.getPropertyAsBoolean( ITBConfig.LOAD_PREV_MODS, true ) ) {
+							try {
+								File dat = new File( resourcesDir, "resource.dat" );
+								ModdedDatInfo datInfo = ModdedDatInfo.build( dat, ModPatchThread.MODDED_INFO_INNERPATH );
+								managerWindow.onInstalledModsLoaded( datInfo.listInstalledMods() );
+							}
+							catch ( IOException e ) {
+								// resource.dat did not contain modded.info, *shrug*
+							}
 						}
 
 						appVersionChecker.checkUpdateInfo();

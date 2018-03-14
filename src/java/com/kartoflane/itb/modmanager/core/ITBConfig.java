@@ -32,6 +32,7 @@ public class ITBConfig extends Properties
 	public static final String APP_UPDATE_INTERVAL =    "appUpdateInterval";
 	public static final String STEAM_DISTRO =           "steamDistro";
 	public static final String STEAM_EXE_PATH =         "steamExePath";
+	public static final String LOAD_PREV_MODS =         "loadPreviousMods";
 	public static final String RUN_STEAM_ITB =          "runSteamITB";
 	public static final String NEVER_RUN_ITB =          "neverRunITB";
 	public static final String REMEMBER_GEOMETRY =      "rememberGeometry";
@@ -91,6 +92,7 @@ public class ITBConfig extends Properties
 			userFieldsMap.put( APP_UPDATE_INTERVAL, "If a number greater than 0, check for newer app versions every N days." );
 			userFieldsMap.put( STEAM_DISTRO,        "If true, Into the Breach was installed via Steam. Stops the GUI asking for a path." );
 			userFieldsMap.put( STEAM_EXE_PATH,      "The path to Steam's executable, if Into the Breach was installed via Steam." );
+			userFieldsMap.put( LOAD_PREV_MODS,      "If true, the manager will attempt to load selection of mods which were previously patched." );
 			userFieldsMap.put( RUN_STEAM_ITB,       "If true, the manager will use Steam to launch Into the Breach, if possible." );
 			userFieldsMap.put( NEVER_RUN_ITB,       "If true, there will be no offer to run the game after patching. Default: false." );
 			userFieldsMap.put( REMEMBER_GEOMETRY,   "If true, window geometry will be saved on exit and restored on startup." );
