@@ -282,6 +282,9 @@ public class ModListController
 
 	private void onDragDetected( MouseEvent e )
 	{
+		if ( e.getButton() != MouseButton.PRIMARY )
+			return;
+
 		if ( e.getSource() == treeView ) {
 			int index = treeView.getSelectionModel().getSelectedIndex();
 
