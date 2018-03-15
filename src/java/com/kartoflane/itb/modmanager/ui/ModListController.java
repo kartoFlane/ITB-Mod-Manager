@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.kartoflane.itb.modmanager.core.ModsScanner;
 import com.kartoflane.itb.modmanager.event.Event;
 import com.kartoflane.itb.modmanager.event.EventDouble;
 import com.kartoflane.itb.modmanager.event.EventSingle;
@@ -44,6 +45,7 @@ public class ModListController
 {
 	private final EventSingle<ModFileInfo> modSelected = new EventSingle<>();
 	private final EventDouble<ModFileInfo, Boolean> modSelectionToggled = new EventDouble<>();
+	private final EventSingle<ListState<ModFileInfo>> modelUpdated = new EventSingle<>();
 
 	private final ChangeListener<Boolean> checkboxSelectionListener;
 
@@ -71,6 +73,15 @@ public class ModListController
 	public Event.Double<ModFileInfo, Boolean> modSelectionToggledEvent()
 	{
 		return modSelectionToggled;
+	}
+
+	/**
+	 * Sent when the mod list has finished updating its model as a result of
+	 * {@link ModsScanner#modsTableStateAmendedEvent()}.
+	 */
+	public Event.Single<ListState<ModFileInfo>> modelUpdated()
+	{
+		return modelUpdated;
 	}
 
 	protected void createGUI() throws IOException
@@ -117,6 +128,8 @@ public class ModListController
 			checkBoxItem.selectedProperty().addListener( checkboxSelectionListener );
 			rootChildren.add( checkBoxItem );
 		}
+
+		modelUpdated.broadcast( tableState );
 	}
 
 	public List<ModFileInfo> getSelectedMods()
