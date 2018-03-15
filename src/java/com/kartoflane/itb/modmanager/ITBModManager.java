@@ -128,7 +128,9 @@ public class ITBModManager extends Application
 			AppVersionChecker appVersionChecker = new AppVersionChecker(
 				config, APP_VERSION, appUpdateFile, appUpdateETagFile
 			);
-			ModsScanner modsScanner = new ModsScanner( config, modsDir, modsTableStateFile, metadataFile );
+			ModsScanner modsScanner = new ModsScanner(
+				config, modsDir, modsTableStateFile, metadataFile
+			);
 
 			File resourcesDir = new File( gameDir, "resources" );
 			File scriptsDir = new File( gameDir, "scripts" );
@@ -140,6 +142,7 @@ public class ITBModManager extends Application
 			File masterStringsBankFile = new File( resourcesDir, "Master Bank.strings.bank" );
 			File musicBankFile = new File( resourcesDir, "music.bank" );
 			File sfxBankFile = new File( resourcesDir, "sfx.bank" );
+
 			BackupManager backupManager = new BackupManager(
 				backupDir,
 				scriptsDir, mapsDir,
@@ -154,8 +157,6 @@ public class ITBModManager extends Application
 			Thread initThread = new Thread(
 				() -> {
 					try {
-						modsScanner.loadCachedModMetadata();
-
 						if ( config.getPropertyAsBoolean( ITBConfig.LOAD_PREV_MODS, true ) ) {
 							try {
 								ModdedDatInfo datInfo = ModdedDatInfo.build( resourceDatFile, ModPatchThread.MODDED_INFO_INNERPATH );
@@ -166,6 +167,7 @@ public class ITBModManager extends Application
 							}
 						}
 
+						modsScanner.loadCachedModMetadata();
 						appVersionChecker.checkUpdateInfo();
 					}
 					catch ( Exception e ) {
@@ -189,7 +191,7 @@ public class ITBModManager extends Application
 		// Ask about Steam.
 		if ( config.getProperty( ITBConfig.STEAM_DISTRO, "" ).length() == 0 ) {
 			Alert alert = new Alert(
-				AlertType.CONFIRMATION, "Was Into the Breach installed via Steam?",
+				AlertType.NONE, "Was Into the Breach installed via Steam?",
 				ButtonType.YES, ButtonType.NO
 			);
 
@@ -268,7 +270,8 @@ public class ITBModManager extends Application
 					ButtonType directly = new ButtonType( "Directly", ButtonBar.ButtonData.OK_DONE );
 					ButtonType steam = new ButtonType( "Steam", ButtonBar.ButtonData.CANCEL_CLOSE );
 					Alert alert = new Alert(
-						AlertType.NONE, "Would you prefer to launch Into the Breach directly, or via Steam?",
+						AlertType.NONE,
+						"Would you prefer to launch Into the Breach directly, or via Steam?",
 						directly, steam
 					);
 					alert.setHeaderText( "How to launch?" );
@@ -313,7 +316,7 @@ public class ITBModManager extends Application
 				+ "You can change this later.";
 
 			Alert alert = new Alert(
-				AlertType.CONFIRMATION, updatePrompt,
+				AlertType.NONE, updatePrompt,
 				ButtonType.YES, ButtonType.NO
 			);
 

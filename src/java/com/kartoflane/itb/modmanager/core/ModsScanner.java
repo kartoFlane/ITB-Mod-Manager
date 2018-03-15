@@ -98,6 +98,7 @@ public class ModsScanner
 	 */
 	public Region buildModInfoPane( ModFileInfo modFileInfo, ObservableValue<? extends Number> widthProperty )
 	{
+		// TODO: Should probably move this method somewhere else
 		String modHash = modFileHashes.get( modFileInfo.getFile() );
 		ModInfo modInfo = localModDB.getModInfo( modHash );
 
@@ -269,6 +270,8 @@ public class ModsScanner
 		scanThread.start();
 	}
 
+	// --------------------------------------------------------------------------------------
+
 	/**
 	 * Reads modorder.txt and returns a list of mod names in preferred order.
 	 */
@@ -349,6 +352,8 @@ public class ModsScanner
 			log.error( String.format( "Error writing metadata from local mods to \"%s\"", modsMetadataFile.getName() ), e );
 		}
 	}
+
+	// --------------------------------------------------------------------------------------
 
 	/**
 	 * Sets the ModDB for local metadata. (thread-safe)

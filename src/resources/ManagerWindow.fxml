@@ -22,9 +22,9 @@
 				</padding>
 				<!-- TreeView inserted here -->
 				<HBox alignment="top_right" spacing="10">
-					<Button fx:id="btnToggleAll" prefWidth="100" onAction="#onToggleAllClicked"
+					<Button fx:id="btnToggleAll" prefWidth="80" onAction="#onToggleAllClicked"
 						text="Toggle All" />
-					<Button fx:id="btnPatch" prefWidth="100" onAction="#onPatchClicked"
+					<Button fx:id="btnPatch" prefWidth="80" onAction="#onPatchClicked"
 						text="Patch" />
 				</HBox>
 			</VBox>

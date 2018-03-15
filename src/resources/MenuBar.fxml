@@ -15,7 +15,7 @@
 					onAction="#onExtractClicked" />
 				<MenuItem fx:id="mntmRepack" text="_Repack .dat..." onAction="#onRepackClicked" />
 				<SeparatorMenuItem />
-				<MenuItem fx:id="mntmPreferences" text="_Preferences"
+				<MenuItem fx:id="mntmPreferences" text="_Preferences..."
 					onAction="#onPreferencesClicked" />
 				<SeparatorMenuItem />
 				<MenuItem fx:id="mntmExit" text="E_xit" onAction="#onExitClicked" />

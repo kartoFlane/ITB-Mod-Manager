@@ -22,7 +22,7 @@ public class ITBModManagerCLI
 			}
 		};
 
-		// TODO
+		// TODO command line interface
 		throw new UnsupportedOperationException( "Not yet implemented" );
 	}
 }

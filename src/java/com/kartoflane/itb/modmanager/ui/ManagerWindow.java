@@ -275,7 +275,7 @@ public class ManagerWindow
 
 		if ( strict ) {
 			// Very reliable, always selects the correct mods, but slow to load.
-			// Realistically not very useful, as the user will have made his selection
+			// Realistically not very useful, as the user will have made their selection
 			// by the time this is ready.
 			selectInstalledModsStrict(
 				listInstalledMods.stream()

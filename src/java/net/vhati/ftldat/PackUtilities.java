@@ -93,7 +93,8 @@ public class PackUtilities
 			AbstractPack srcPack = new FTLPack( srcFile, "r" );
 			AbstractPack dstPack = new FolderPack( dstFile )
 		) {
-
+			// TODO: Clear all files in the destination directory?
+			
 			for ( String innerPath : srcPack.list() ) {
 				if ( dstPack.contains( innerPath ) )
 					dstPack.remove( innerPath );
