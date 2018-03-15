@@ -134,7 +134,8 @@ public class BackupManager
 	{
 		if ( !resourceBud.bakFile.exists() ) {
 			// Backups don't exist yet, nothing to do here.
-			return true;
+			// But don't force backups in case only the dat file is missing.
+			return false;
 		}
 
 		try (
