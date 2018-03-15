@@ -208,6 +208,7 @@ public class ManagerWindow
 		modsScanner.scanningStateChangedEvent().addListener( menuController::onScanningStateChanged );
 
 		modListController.modSelectedEvent().addListener( this::onModSelected );
+		modListController.modsAddedEvent().addListener( this::processAddedMods );
 	}
 
 	private void removePreviousContentRight()
@@ -443,6 +444,12 @@ public class ManagerWindow
 		else {
 			showLocalModInfo( modFileInfo );
 		}
+	}
+
+	private void processAddedMods( List<File> modsToAdd )
+	{
+		modsScanner.addModFiles( modsToAdd );
+		modsScanner.rescanMods( modListController.getCurrentModsTableState() );
 	}
 
 	private void onCloseRequest( WindowEvent e )

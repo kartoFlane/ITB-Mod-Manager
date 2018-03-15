@@ -46,6 +46,7 @@ public class ModListController
 	private final EventSingle<ModFileInfo> modSelected = new EventSingle<>();
 	private final EventDouble<ModFileInfo, Boolean> modSelectionToggled = new EventDouble<>();
 	private final EventSingle<ListState<ModFileInfo>> modelUpdated = new EventSingle<>();
+	private final EventSingle<List<File>> modsAdded = new EventSingle<>();
 
 	private final ChangeListener<Boolean> checkboxSelectionListener;
 
@@ -82,6 +83,14 @@ public class ModListController
 	public Event.Single<ListState<ModFileInfo>> modelUpdated()
 	{
 		return modelUpdated;
+	}
+
+	/**
+	 * Sent when user drops new mod files onto the mod list via drag and drop.
+	 */
+	public Event.Single<List<File>> modsAddedEvent()
+	{
+		return modsAdded;
 	}
 
 	protected void createGUI() throws IOException
@@ -314,6 +323,22 @@ public class ModListController
 			else {
 				e.acceptTransferModes( TransferMode.MOVE );
 			}
+
+			e.consume();
+		}
+		else if ( db.hasFiles() ) {
+			boolean accept = db.getFiles().stream()
+				.map( file -> file.getName() )
+				.anyMatch( name -> name.endsWith( ".itb" ) || name.endsWith( ".zip" ) );
+
+			if ( accept ) {
+				e.acceptTransferModes( TransferMode.COPY );
+			}
+			else {
+				e.acceptTransferModes( TransferMode.NONE );
+			}
+
+			e.consume();
 		}
 		else {
 			e.acceptTransferModes( TransferMode.NONE );
@@ -356,7 +381,15 @@ public class ModListController
 				success = true;
 			}
 		}
+		else if ( db.hasFiles() ) {
+			List<File> files = db.getFiles().stream()
+				.filter( file -> file.getName().endsWith( ".zip" ) || file.getName().endsWith( ".itb" ) )
+				.collect( Collectors.toList() );
 
+			modsAdded.broadcast( files );
+		}
+
+		e.consume();
 		e.getDragboard().clear();
 		e.setDropCompleted( success );
 	}

@@ -214,6 +214,19 @@ public class ModsScanner
 			.orElse( null );
 	}
 
+	public void addModFiles( List<File> modsToAdd )
+	{
+		for ( File file : modsToAdd ) {
+			try {
+				File dstFile = new File( modsDir, file.getName() );
+				PackUtilities.copyFile( file, dstFile );
+			}
+			catch ( IOException e ) {
+				log.error( "Error occurred while copying mod " + file.getName(), e );
+			}
+		}
+	}
+
 	/**
 	 * Clears and syncs the mods list with mods/ dir, then starts a new hash thread.
 	 */
