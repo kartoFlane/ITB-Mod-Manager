@@ -357,6 +357,10 @@ public class ModPatchThread extends Thread
 			patchingProgressChanged.broadcast( progMilestone, progMax );
 
 			// Rebuild scripts.lua
+			moddedScriptsList = moddedScriptsList.stream()
+				.map( script -> scriptsDir.getName() + "/" + script )
+				.collect( Collectors.toList() );
+
 			try ( InputStream is = Util.getInputStream( rebuildScriptsList( vanillaScriptsList, moddedScriptsList ) ) ) {
 				if ( scriptsPack.contains( SCRIPTS_LIST_INNERPATH ) )
 					scriptsPack.remove( SCRIPTS_LIST_INNERPATH );
