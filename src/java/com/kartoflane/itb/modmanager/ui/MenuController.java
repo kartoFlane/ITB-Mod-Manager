@@ -113,9 +113,6 @@ public class MenuController
 		if ( !config.getPropertyAsBoolean( ITBConfig.STEAM_DISTRO, false ) ) {
 			mntmVerifyIntegrity.setDisable( true );
 		}
-
-		// Temp while those buttons' functions are not implemented yet
-		mntmPreferences.setDisable( true );
 	}
 
 	public MenuBar getMenuBar()
@@ -186,8 +183,16 @@ public class MenuController
 	@FXML
 	private void onPreferencesClicked( ActionEvent event )
 	{
-		// TODO preferences
-		throw new UnsupportedOperationException( "TODO" );
+		try {
+			ConfigDialogController dialog = new ConfigDialogController(
+				(Stage)menuBar.getScene().getWindow(), config
+			);
+
+			dialog.show();
+		}
+		catch ( IOException e ) {
+			log.error( "Error while creating preferences dialog.", e );
+		}
 	}
 
 	@FXML

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.ScrollPane?>
+
+<VBox alignment="top_center" xmlns:fx="http://javafx.com/fxml"
+	minWidth="310" minHeight="250" prefWidth="400" prefHeight="500">
+	<ScrollPane fx:id="scrollPane" VBox.vgrow="ALWAYS"
+		fitToHeight="true" fitToWidth="true">
+	</ScrollPane>
+
+	<HBox alignment="center">
+		<padding>
+			<Insets bottom="10" left="10" right="10" top="10" />
+		</padding>
+		<Button fx:id="btnApply" onAction="#onApplyClicked" text="Apply" prefWidth="80"
+			defaultButton="true" />
+	</HBox>
+</VBox>
