@@ -314,7 +314,7 @@ public class ManagerWindow
 
 	private void selectInstalledModsSloppy( List<String> fileNames )
 	{
-		modsScanner.modsTableStateAmendedEvent().addListenerSelfCleaning(
+		modListController.modelUpdated().addListenerSelfCleaning(
 			listState -> Platform.runLater(
 				() -> {
 					log.trace( "Loading list of installed mods using sloppy matching." );
