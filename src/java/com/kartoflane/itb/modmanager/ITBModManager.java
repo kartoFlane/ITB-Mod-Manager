@@ -287,6 +287,24 @@ public class ITBModManager extends Application
 			}
 		}
 
+		if ( config.getProperty( ITBConfig.LOAD_PREV_MODS, "" ).length() == 0 ) {
+			Alert alert = new Alert(
+				AlertType.NONE,
+				"Would you like the manager to load your selection of previously installed mods when it runs?",
+				ButtonType.YES, ButtonType.NO
+			);
+			alert.setHeaderText( "" );
+
+			Optional<ButtonType> response = alert.showAndWait();
+
+			if ( response.isPresent() && response.get() == ButtonType.YES ) {
+				config.setProperty( ITBConfig.LOAD_PREV_MODS, "true" );
+			}
+			else {
+				config.setProperty( ITBConfig.LOAD_PREV_MODS, "false" );
+			}
+		}
+
 		// Prompt if update_catalog is invalid or hasn't been set.
 		if ( !config.getProperty( ITBConfig.APP_UPDATE_INTERVAL, "" ).matches( "^\\d+$" ) ) {
 			String updatePrompt = ""
