@@ -187,7 +187,7 @@ public class ModPatchThread extends Thread
 			BackedUpFile resourceBud = backupManager.getBackupForFile( resourceDatFile );
 
 			patchingStatusChanged.broadcast( "Checking hashes..." );
-			boolean forceBackup = backupManager.checkDatHash( resourceBud, MODDED_INFO_INNERPATH );
+			boolean forceBackup = backupManager.checkModdedInfo( resourceBud, MODDED_INFO_INNERPATH );
 
 			boolean resourceBakExisted = resourceBud.bakFile.exists();
 			boolean backupSuccessful = backupAndRestoreGameData( backedUpDats, forceBackup );
@@ -202,10 +202,7 @@ public class ModPatchThread extends Thread
 					AbstractPack pack = new FTLPack( resourceBud.bakFile, "r+" )
 				) {
 					if ( pack.contains( MODDED_INFO_INNERPATH ) ) {
-						log.warn( "Game's resources already contained modded info. Game may not be in vanilla state." );
 						// Don't overwrite, since the hash we just computed is wrong.
-						// TODO: Display an alert warning the user, and ask if they want to continue patching anyway?
-						// will need a way to stop this thread and wait for the alert to be dismissed, tho.
 					}
 					else {
 						pack.add( MODDED_INFO_INNERPATH, is );

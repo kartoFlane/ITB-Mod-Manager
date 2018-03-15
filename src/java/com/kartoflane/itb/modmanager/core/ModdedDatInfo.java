@@ -74,6 +74,14 @@ public class ModdedDatInfo
 	}
 
 	/**
+	 * Returns true if the .dat contains information about installed mods, ie. the .dat is not vanilla.
+	 */
+	public boolean hasMods()
+	{
+		return !installedModFileNames.isEmpty() || !installedModHashes.isEmpty();
+	}
+
+	/**
 	 * Returns a string containing the Lua object representation of the specified ModdedDatInfo.
 	 */
 	public String toLuaString()
