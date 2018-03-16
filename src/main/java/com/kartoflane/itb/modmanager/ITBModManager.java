@@ -35,9 +35,9 @@ public class ITBModManager extends Application
 	private static final Logger log = LogManager.getLogger();
 
 	public static final ComparableVersion APP_VERSION = new ComparableVersion( "dev-1" );
-	public static final String APP_NAME = "Into The Breach Mod Manager";
+	public static final String APP_NAME = "Into the Breach Mod Manager";
 	public static final String APP_AUTHOR = "kartoFlane";
-	public static final String APP_URL = "http://www.subsetgames.com/forum/viewforum.php?f=26"; // TODO forum link
+	public static final String APP_URL = "https://github.com/kartoFlane/ITB-Mod-Manager"; // TODO forum link
 
 	private static Application APP = null;
 
